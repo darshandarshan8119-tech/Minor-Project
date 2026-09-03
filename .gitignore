@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build Outputs
+dist/
+build/
+
+# Python & Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Secrets (NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Editor & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

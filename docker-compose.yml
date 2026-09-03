@@ -1,0 +1,106 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: agrimart
+      POSTGRES_USER: agrimart
+      POSTGRES_PASSWORD: agrimart_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/docker/postgres/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agrimart -d agrimart"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  django:
+    build:
+      context: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgres://agrimart:agrimart_dev_password@postgres:5432/agrimart
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  fastapi:
+    build:
+      context: ./backend
+    command: uvicorn realtime.main:app --host 0.0.0.0 --port 8001 --reload
+    env_file:
+      - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgres://agrimart:agrimart_dev_password@postgres:5432/agrimart
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+    command: celery -A agrimart worker -l INFO -Q critical,default,notifications,ai,reconciliation
+    env_file:
+      - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgres://agrimart:agrimart_dev_password@postgres:5432/agrimart
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: ./backend
+    command: celery -A agrimart beat -l INFO
+    env_file:
+      - ./backend/.env.example
+    environment:
+      DATABASE_URL: postgres://agrimart:agrimart_dev_password@postgres:5432/agrimart
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
