@@ -37,9 +37,9 @@ export default function App() {
   const [cart, setCart] = useState([
     {
       id: 1,
-      name: 'Pioneer 3302 Heritage Maize Cultivar',
+      name: 'Pioneer Heritage Hybrid Maize Seeds (5kg)',
       price: 540,
-      image: '/images/category-seeds.jpg',
+      image: '/images/seeds-hybrid-maize.jpg',
       quantity: 1
     }
   ]);
@@ -254,13 +254,13 @@ export default function App() {
         />
       )}
 
-      {/* TOP STRIP: ONLY show Mandi Stock Ticker when in Mandi mode; in Store mode show clean village delivery strip */}
+      {/* TOP STRIP: ONLY show Mandi Stock Ticker when in Mandi mode; in Store mode show sleek executive dispatch strip */}
       {activeMode === 'mandi' ? (
         <MandiTicker onOpenMandiTerminal={() => {}} />
       ) : (
-        <div className="bg-[#121212] text-[#FBFBF9] text-[11px] py-2 px-4 tracking-wide font-medium text-center flex items-center justify-center gap-2">
-          <Truck className="w-3.5 h-3.5 text-[#D4A373]" />
-          <span>Free Doorstep Village Delivery on orders over ₹499 &bull; Cash on Delivery (COD) Available</span>
+        <div className="bg-[#F5F4F0] border-b border-black/[0.05] text-[#55534E] text-xs py-2 px-4 sm:px-8 font-sans flex items-center justify-center gap-2">
+          <Truck className="w-3.5 h-3.5 text-[#B45309] shrink-0" />
+          <span>Free doorstep village delivery on orders over ₹499 &bull; Cash on Delivery (COD) available across rural India</span>
         </div>
       )}
 
@@ -280,7 +280,6 @@ export default function App() {
           setCurrentCategory(cat);
           scrollToSection('catalog-section');
         }}
-        onExitToLanding={handleExitToLanding}
         mandiTab={mandiTab}
         onSelectMandiTab={(tab) => {
           if (activeMode !== 'mandi') setActiveMode('mandi');

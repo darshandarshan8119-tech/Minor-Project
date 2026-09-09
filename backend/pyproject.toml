@@ -18,6 +18,8 @@ dependencies = [
     "argon2-cffi>=23.1,<26.0",
     "python-multipart>=0.0.9,<0.1",
     "Pillow>=10.4,<12.0",
+    "djangorestframework-simplejwt>=5.5.1",
+    "django-cors-headers>=4.9.0",
 ]
 
 [dependency-groups]

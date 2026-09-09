@@ -20,11 +20,19 @@ class APMC(UUIDPrimaryKeyModel):
 class Commodity(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=120)
     code = models.CharField(max_length=40, unique=True)
+    ticker_symbol = models.CharField(max_length=24, blank=True, null=True, unique=True)
+    variety = models.CharField(max_length=120, blank=True, default="")
     category = models.CharField(max_length=80)
     standard_msp_rate = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
+    agmarknet_modal_rate = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    basis_moisture_pct = models.DecimalField(max_digits=5, decimal_places=2, default=11.00)
+    moisture_tolerance_pct = models.DecimalField(max_digits=4, decimal_places=2, default=0.50)
+    moisture_discount_rate_per_pct = models.DecimalField(max_digits=8, decimal_places=2, default=30.00)
+    max_rejection_moisture_pct = models.DecimalField(max_digits=5, decimal_places=2, default=14.00)
+    assay_specs = models.JSONField(default=dict, blank=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.ticker_symbol or self.code}: {self.name}"
 
 
 class DailyTicker(UUIDPrimaryKeyModel):
@@ -100,6 +108,8 @@ class Settlement(UUIDPrimaryKeyModel, TimeStampedModel):
     lot = models.OneToOneField(AuctionLot, on_delete=models.PROTECT, related_name="settlement")
     winning_bid = models.ForeignKey(MerchantBid, on_delete=models.PROTECT)
     gross_amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
+    moisture_deduction_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     platform_fee = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    escrow_reserve_fee = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     farmer_payout_amount = models.DecimalField(max_digits=14, decimal_places=2, validators=[MinValueValidator(0)])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

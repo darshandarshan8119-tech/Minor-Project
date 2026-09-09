@@ -274,16 +274,30 @@ class Command(BaseCommand):
 
         # 6. Commodities & Daily Tickers
         commodities = [
-            ("Wheat (Sharbati/Kharif)", "WHEAT-SHAR", "Cereals", Decimal("2275.00"), "PB-LDH-01", 2450, 2410, 2480, 4200),
-            ("Mustard Seed (Black)", "MUST-BLK", "Oilseeds", Decimal("5450.00"), "RJ-ALW-01", 5680, 5550, 5720, 2800),
-            ("Cotton (Shankar-6)", "COTTON-S6", "Fibre", Decimal("6620.00"), "GJ-RJK-01", 7140, 7110, 7220, 6400),
-            ("Basmati Paddy 1121", "PAD-BASM", "Cereals", Decimal("3800.00"), "HR-KRN-01", 4420, 4280, 4460, 5100),
-            ("Soybean (Yellow Seed)", "SOY-YEL", "Oilseeds", Decimal("4600.00"), "MP-IND-01", 4820, 4760, 4850, 3700),
-            ("Red Chilli (Teja Variety)", "CHIL-TEJA", "Spices", Decimal("14000.00"), "AP-GNT-01", 18500, 17600, 18900, 8900),
+            ("Paddy Sona Masoori A1", "PAD-SONA", "PDY-SONA-A1", "Sona Masoori Grade-A (Aged 12m)", "Cereals", Decimal("2300.00"), Decimal("2680.00"), "HR-KRN-01", 2850, 2780, 2890, 5800, Decimal("11.00"), Decimal("0.50"), Decimal("35.00")),
+            ("Paddy Gujarat PR-106", "PAD-PR106", "PDY-GUJ-PR1", "PR-106 Export Slender Grain", "Cereals", Decimal("2183.00"), Decimal("2180.00"), "GJ-RJK-01", 2240, 2190, 2280, 4200, Decimal("12.00"), Decimal("0.50"), Decimal("30.00")),
+            ("Wheat Sharbati Golden", "WHEAT-SHAR", "WHT-SHAR-G1", "Sharbati High-Gluten Golden Grain", "Cereals", Decimal("2275.00"), Decimal("3250.00"), "PB-LDH-01", 3450, 3380, 3490, 4200, Decimal("10.50"), Decimal("0.50"), Decimal("40.00")),
+            ("Mustard Seed Yellow 42%", "MUST-YEL", "MUST-RAJ-O42", "Yellow Sarson High-Oil Purity 98%", "Oilseeds", Decimal("5450.00"), Decimal("5450.00"), "RJ-ALW-01", 5720, 5600, 5780, 2800, Decimal("8.00"), Decimal("0.50"), Decimal("50.00")),
+            ("Cotton Shankar-6 29mm", "COTTON-S6", "COTN-GUJ-S6", "Shankar-6 Machine Picked 29mm Staple", "Fibre", Decimal("6620.00"), Decimal("7050.00"), "GJ-RJK-01", 7140, 7080, 7240, 6400, Decimal("8.50"), Decimal("0.50"), Decimal("60.00")),
+            ("Desi Chana Machine Clean", "CHNA-DESI", "CHNA-DESI-B", "Desi Chana Bold Kernel Machine Cleaned", "Pulses", Decimal("5440.00"), Decimal("5600.00"), "MP-IND-01", 5820, 5740, 5880, 3100, Decimal("9.50"), Decimal("0.50"), Decimal("45.00")),
         ]
         today = date.today()
-        for cname, code, cat, msp, apmc_code, modal, min_p, max_p, volume in commodities:
-            c, _ = Commodity.objects.get_or_create(code=code, defaults={"name": cname, "category": cat, "standard_msp_rate": msp})
+        for cname, code, ticker, variety, cat, msp, agmarknet, apmc_code, modal, min_p, max_p, volume, basis_m, tol_m, disc_m in commodities:
+            c, _ = Commodity.objects.update_or_create(
+                code=code,
+                defaults={
+                    "name": cname,
+                    "ticker_symbol": ticker,
+                    "variety": variety,
+                    "category": cat,
+                    "standard_msp_rate": msp,
+                    "agmarknet_modal_rate": agmarknet,
+                    "basis_moisture_pct": basis_m,
+                    "moisture_tolerance_pct": tol_m,
+                    "moisture_discount_rate_per_pct": disc_m,
+                    "max_rejection_moisture_pct": Decimal("14.00"),
+                },
+            )
             DailyTicker.objects.update_or_create(
                 mandi=apmc_map[apmc_code],
                 commodity=c,
@@ -296,7 +310,7 @@ class Command(BaseCommand):
                     "arrivals_volume": Decimal(str(volume)),
                 },
             )
-        self.stdout.write(self.style.SUCCESS("  [+] Seeded 6 Commodities with Live APMC Tickers"))
+        self.stdout.write(self.style.SUCCESS("  [+] Seeded 6 Standardized Ticker Contracts with Live APMC Tickers"))
 
         # 7. Initial Active Auction Lots
         wheat_comm = Commodity.objects.get(code="WHEAT-SHAR")

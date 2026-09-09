@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { 
   TrendingUp, TrendingDown, ArrowUpRight, Search, 
-  Sparkles, ShieldCheck, Scale, CheckCircle2, X 
+  Sparkles, ShieldCheck, Scale, CheckCircle2, X,
+  Building2, Warehouse, Activity, Award
 } from 'lucide-react';
-import { LIVE_MANDI_COMMODITIES } from '../data/mockData';
+import { LIVE_MANDI_COMMODITIES, MANDI_INFRASTRUCTURE } from '../data/mockData';
 
 export default function MandiMarketTerminal() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,7 +52,7 @@ export default function MandiMarketTerminal() {
               Real-Time Crop Commodity Exchange
             </h2>
             <p className="text-white/60 text-xs sm:text-sm font-sans mt-1 max-w-xl">
-              Track live mandi prices across key Indian APMCs. Compare daily fluctuations, volume arrivals, or list your harvest lot for verified merchant auctions.
+              Track live mandi prices across key Indian APMCs with verified lab assays. Compare daily fluctuations, volume arrivals, or list your harvest lot for verified merchant auctions.
             </p>
           </div>
 
@@ -84,31 +85,42 @@ export default function MandiMarketTerminal() {
             </div>
 
             {/* List of Commodities */}
-            <div className="space-y-2.5 max-h-[460px] overflow-y-auto no-scrollbar pr-1">
+            <div className="space-y-2.5 max-h-[490px] overflow-y-auto no-scrollbar pr-1">
               {filtered.map((item) => {
                 const isSelected = selectedCommodity.id === item.id;
                 return (
                   <div
                     key={item.id}
                     onClick={() => setSelectedCommodity(item)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
                       isSelected 
                         ? 'bg-white/10 border-[#E67E22] shadow-md' 
                         : 'bg-white/[0.03] border-white/5 hover:bg-white/[0.06]'
                     }`}>
                     
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-heading font-extrabold text-sm text-white">
-                          {item.name}
-                        </h4>
-                        <span className="text-[10px] font-mono text-white/40 font-semibold bg-white/5 px-2 py-0.5 rounded">
-                          {item.mandi.split(',')[0]}
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Commodity High-Res Thumbnail */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-white/5 shrink-0 border border-white/10">
+                        <img 
+                          src={item.cropImage || item.image} 
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-heading font-extrabold text-sm text-white truncate">
+                            {item.name}
+                          </h4>
+                          <span className="text-[10px] font-mono text-white/40 font-semibold bg-white/5 px-2 py-0.5 rounded">
+                            {item.mandi.split(',')[0]}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-white/50 font-sans block mt-0.5">
+                          Arrival: <span className="text-white/70 font-mono">{item.volume}</span> &bull; <span className="text-[#E67E22]/90 font-mono text-[10px]">{item.grade || 'Assay Certified'}</span>
                         </span>
                       </div>
-                      <span className="text-[11px] text-white/50 font-sans block mt-0.5">
-                        Volume Arrival: {item.volume}
-                      </span>
                     </div>
 
                     <div className="text-right shrink-0">
@@ -130,15 +142,44 @@ export default function MandiMarketTerminal() {
 
           </div>
 
-          {/* Right Column: Selected Commodity Deep Dive & Sparkline (5 Cols) */}
+          {/* Right Column: Selected Commodity Deep Dive & Real Imagery (5 Cols) */}
           <div className="lg:col-span-5 bg-white/[0.04] border border-white/10 rounded-2xl p-6 flex flex-col justify-between">
             <div>
               
               <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
-                <span className="text-[11px] font-mono font-bold text-[#E67E22] uppercase tracking-wider">
+                <span className="text-[11px] font-mono font-bold text-[#E67E22] uppercase tracking-wider flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5" />
                   Mandi Detailed Analytics
                 </span>
-                <span className="text-[10px] text-white/40 font-sans">Updated 12 mins ago</span>
+                <span className="text-[10px] text-white/40 font-sans">Live Ticker Synced</span>
+              </div>
+
+              {/* Selected Commodity Hero Media Card */}
+              <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-4 border border-white/10 group">
+                <img 
+                  src={selectedCommodity.image || selectedCommodity.cropImage} 
+                  alt={selectedCommodity.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-black/70 backdrop-blur-md border border-white/20 text-[#10B981] flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Verified Mandi Lot</span>
+                </div>
+
+                <div className="absolute bottom-2.5 left-3 right-3 flex items-end justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase text-[#E67E22] font-bold block">Assay Profile</span>
+                    <span className="text-xs font-heading font-extrabold text-white">{selectedCommodity.grade || 'Grade A'}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-mono uppercase text-white/50 block">Moisture Index</span>
+                    <span className="text-xs font-mono font-bold text-white bg-white/10 px-2 py-0.5 rounded border border-white/10">
+                      {selectedCommodity.moisture || '11.4%'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <h3 className="text-xl font-bold font-heading text-white">
@@ -149,7 +190,7 @@ export default function MandiMarketTerminal() {
               </p>
 
               {/* Price Callout */}
-              <div className="my-5 p-4 rounded-xl bg-white/5 border border-white/5 flex items-baseline justify-between">
+              <div className="my-4 p-4 rounded-xl bg-white/5 border border-white/5 flex items-baseline justify-between">
                 <div>
                   <span className="text-[10px] font-mono uppercase text-white/40 block">Current Modal Rate</span>
                   <span className="text-3xl font-black font-mono text-white">
@@ -167,7 +208,7 @@ export default function MandiMarketTerminal() {
               </div>
 
               {/* Day High / Low / Volume Grid */}
-              <div className="grid grid-cols-2 gap-3 text-xs font-mono mb-5">
+              <div className="grid grid-cols-2 gap-3 text-xs font-mono mb-4">
                 <div className="p-3 rounded-xl bg-white/[0.03] border border-white/5">
                   <span className="text-white/40 text-[10px] uppercase block font-sans">Day High</span>
                   <span className="font-bold text-white">₹{selectedCommodity.dayHigh.toLocaleString()}</span>
@@ -179,9 +220,9 @@ export default function MandiMarketTerminal() {
               </div>
 
               {/* 7-Day Trajectory Visual Bar */}
-              <div className="space-y-1.5 mb-5">
+              <div className="space-y-1.5 mb-4">
                 <span className="text-[10px] font-mono text-white/40 uppercase block font-sans">7-Day Trajectory Index</span>
-                <div className="flex items-end gap-1.5 h-12 pt-2">
+                <div className="flex items-end gap-1.5 h-10 pt-1">
                   {selectedCommodity.sparkline.map((val, idx) => {
                     const min = Math.min(...selectedCommodity.sparkline);
                     const max = Math.max(...selectedCommodity.sparkline);
@@ -204,12 +245,62 @@ export default function MandiMarketTerminal() {
 
             <button
               onClick={() => setIsAuctionModalOpen(true)}
-              className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs font-heading border border-white/20 transition-all flex items-center justify-center gap-2">
+              className="w-full py-3 rounded-xl bg-white/10 hover:bg-[#E67E22] hover:text-[#111315] text-white font-bold text-xs font-heading border border-white/20 transition-all flex items-center justify-center gap-2 mt-2">
               <span>Sell {selectedCommodity.name.split('(')[0]} on AgriMart Auction</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
+        </div>
+
+        {/* APMC National Logistics, Warehousing & Assay Infrastructure Showcase */}
+        <div className="mt-12 pt-10 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+            <div>
+              <span className="text-[10px] font-mono text-[#E67E22] uppercase font-bold tracking-widest block">
+                Integrated APMC Network
+              </span>
+              <h3 className="text-lg sm:text-xl font-extrabold font-heading text-white">
+                Logistics Hubs, Storage Silos &amp; Assay Labs
+              </h3>
+            </div>
+            <span className="text-xs text-white/40 font-sans">
+              Govt. Accredited CWC Godowns &amp; e-NAM Clearing
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {MANDI_INFRASTRUCTURE.map((item) => (
+              <div 
+                key={item.id}
+                className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-[#E67E22]/50 transition-all duration-300 flex flex-col">
+                <div className="relative aspect-[16/10] overflow-hidden bg-black/40">
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  />
+                  <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase bg-black/70 backdrop-blur-sm text-[#E67E22] border border-[#E67E22]/30">
+                    {item.tag}
+                  </span>
+                </div>
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h4 className="font-heading font-extrabold text-sm text-white group-hover:text-[#E67E22] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-white/50 font-sans mt-1 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="pt-3 mt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-white/40">
+                    <span>STATUS: OPERATIONAL</span>
+                    <span className="text-[#10B981] font-bold">&bull; 100% ESCROW BACKED</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 
@@ -61,19 +62,35 @@ def settle_expired_lots(limit: int = 100) -> int:
         lots = (
             AuctionLot.objects.select_for_update(skip_locked=True)
             .filter(status=AuctionLot.Status.ACTIVE, expires_at__lte=timezone.now(), leading_bid__isnull=False)
+            .select_related("commodity")
             .order_by("expires_at")[:limit]
         )
         for lot in lots:
             winning_bid = lot.leading_bid
-            gross = winning_bid.bid_amount_per_qtl * lot.quantity_quintals
-            fee = gross * 0.02
+            gross = Decimal(str(winning_bid.bid_amount_per_qtl)) * Decimal(str(lot.quantity_quintals))
+
+            # Auto-discount for moisture excess beyond tolerance band
+            basis_limit = lot.commodity.basis_moisture_pct + lot.commodity.moisture_tolerance_pct
+            moisture_deduction = Decimal("0.00")
+            if lot.moisture_pct > basis_limit and lot.moisture_pct <= lot.commodity.max_rejection_moisture_pct:
+                excess_moisture = lot.moisture_pct - basis_limit
+                deduction_rate = excess_moisture * lot.commodity.moisture_discount_rate_per_pct
+                moisture_deduction = (deduction_rate * Decimal(str(lot.quantity_quintals))).quantize(Decimal("0.01"))
+
+            net_value = max(Decimal("0.00"), gross - moisture_deduction)
+            platform_fee = (net_value * Decimal("0.015")).quantize(Decimal("0.01"))
+            escrow_reserve_fee = (net_value * Decimal("0.005")).quantize(Decimal("0.01"))
+            farmer_payout = net_value - platform_fee - escrow_reserve_fee
+
             Settlement.objects.get_or_create(
                 lot=lot,
                 defaults={
                     "winning_bid": winning_bid,
                     "gross_amount": gross,
-                    "platform_fee": fee,
-                    "farmer_payout_amount": gross - fee,
+                    "moisture_deduction_amount": moisture_deduction,
+                    "platform_fee": platform_fee,
+                    "escrow_reserve_fee": escrow_reserve_fee,
+                    "farmer_payout_amount": farmer_payout,
                 },
             )
             winning_bid.status = MerchantBid.Status.ACCEPTED
