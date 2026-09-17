@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   Search, Heart, ShoppingBag, User, ArrowRight, 
-  Layers, Tractor, TrendingUp, Scale, Package, Gavel
+  Layers, Tractor, TrendingUp, Scale, Package, Gavel, FileText
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -235,6 +235,18 @@ export default function Navbar({
                 }`}>
                 <span>Merchant Bids</span>
                 {mandiTab === 'bids' && (
+                  <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#1A1A1A] rounded-full" />
+                )}
+              </button>
+
+              <button
+                onClick={() => onSelectMandiTab('contracts')}
+                className={`py-1 relative flex items-center gap-1.5 transition-colors ${
+                  mandiTab === 'contracts' ? 'text-[#1A1A1A] font-bold' : 'text-[#6B6A66] hover:text-[#1A1A1A]'
+                }`}>
+                <FileText className="w-3.5 h-3.5 text-[#166534]" />
+                <span>Contract Notes &amp; Escrow</span>
+                {mandiTab === 'contracts' && (
                   <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#1A1A1A] rounded-full" />
                 )}
               </button>
