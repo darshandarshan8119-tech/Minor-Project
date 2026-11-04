@@ -80,3 +80,35 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+/* Architectural Motion & Kinetic Lighting */
+@keyframes kenburns-slow {
+  0% { transform: scale(1.0); }
+  50% { transform: scale(1.035); }
+  100% { transform: scale(1.0); }
+}
+
+@keyframes ambient-shimmer {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 0.65; transform: translateY(-4px); }
+}
+
+.animate-kenburns {
+  animation: kenburns-slow 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-shimmer {
+  animation: ambient-shimmer 6s ease-in-out infinite;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

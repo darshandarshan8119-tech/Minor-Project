@@ -24,6 +24,8 @@ export default function App() {
 
   // Master Executive Mode inside 'app': 'store' (Store & Rentals) or 'mandi' (AgriStock Terminal)
   const [activeMode, setActiveMode] = useState('store');
+
+  const [targetAppMode, setTargetAppMode] = useState('store');
   const [mandiTab, setMandiTab] = useState('exchange'); // 'exchange' | 'arrivals' | 'lots' | 'bids' | 'auction'
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionMessage, setTransitionMessage] = useState('');
@@ -56,7 +58,7 @@ export default function App() {
     setTransitionMessage(`Authenticating Member Session for ${userData.name}...`);
 
     setTimeout(() => {
-      setActiveMode('store');
+      setActiveMode(targetAppMode || 'store');
       setCurrentView('app');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => {
@@ -222,21 +224,42 @@ export default function App() {
       <>
         {isTransitioning && (
           <AestheticTransitionLoader 
-            targetMode="store" 
+            targetMode={targetAppMode || "store"} 
             message={transitionMessage} 
           />
         )}
 
         <AgriMartLandingPage 
-          onEnterPlatform={() => {
+          onEnterPlatform={(appKey = 'store') => {
+            const target = appKey === 'mandi' ? 'mandi' : 'store';
+            setTargetAppMode(target);
             setIsTransitioning(true);
-            setTransitionMessage('Opening Secure Member Access...');
+            setTransitionMessage(
+              target === 'mandi'
+                ? 'Opening AG Market & Mandi Access...'
+                : 'Opening AG Store & Fleet Access...'
+            );
             setTimeout(() => {
               setCurrentView('login');
               window.scrollTo({ top: 0, behavior: 'smooth' });
               setTimeout(() => setIsTransitioning(false), 200);
             }, 400);
-          }} 
+          }}
+          onNavigateRoute={(route, appKey = 'store') => {
+            const target = appKey === 'mandi' ? 'mandi' : 'store';
+            setTargetAppMode(target);
+            setIsTransitioning(true);
+            setTransitionMessage(
+              target === 'mandi'
+                ? 'Connecting to AG Market Terminal...'
+                : 'Connecting to AG Store & Fleet...'
+            );
+            setTimeout(() => {
+              setCurrentView('login');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setTimeout(() => setIsTransitioning(false), 200);
+            }, 400);
+          }}
         />
       </>
     );
