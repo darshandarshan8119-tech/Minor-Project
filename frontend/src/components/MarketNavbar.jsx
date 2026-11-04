@@ -5,7 +5,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Scale, FileText, ArrowLeft, User, Search, ShieldCheck,
-  TrendingUp, Activity, Landmark
+  TrendingUp, Activity, Landmark, Sparkles
 } from 'lucide-react';
 import AGMonogram from './AGMonogram';
 
@@ -153,6 +153,18 @@ export default function MarketNavbar({
               <span>Contract Notes &amp; Escrow</span>
               {mandiTab === 'contracts' && (
                 <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#1A1A1A] rounded-full" />
+              )}
+            </button>
+
+            <button
+              onClick={() => onSelectMandiTab('copilot')}
+              className={`py-1 relative flex items-center gap-1.5 transition-colors ${
+                mandiTab === 'copilot' ? 'text-[#1A1A1A] font-bold' : 'text-[#6B6A66] hover:text-[#1A1A1A]'
+              }`}>
+              <Sparkles className="w-3.5 h-3.5 text-[#C26747]" />
+              <span className="font-semibold">AI Copilot</span>
+              {mandiTab === 'copilot' && (
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#C26747] rounded-full" />
               )}
             </button>
           </div>

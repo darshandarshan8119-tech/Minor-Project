@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     "rentals",
     "mandi",
     "ai",
+    "conversations",
+    "bookings",
+    "transactions",
 ]
 
 MIDDLEWARE = [

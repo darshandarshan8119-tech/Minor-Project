@@ -117,4 +117,73 @@ export async function apiPlaceBid(lotId, bidAmountPerQtl, idempotencyKey) {
   });
 }
 
+/**
+ * Fetch Commodities Master List
+ */
+export async function apiGetCommodities() {
+  return apiRequest('/api/v1/mandi/commodities/');
+}
+
+/**
+ * Fetch Mandi APMC Master List
+ */
+export async function apiGetAPMCs() {
+  return apiRequest('/api/v1/mandi/apmcs/');
+}
+
+/**
+ * Assistant Market Chat Query
+ */
+export async function apiAssistantChat(message, conversationId, explanationLevel = 'simple', language = 'en') {
+  return apiRequest('/api/v1/assistant/chat/', {
+    method: 'POST',
+    body: JSON.stringify({
+      message,
+      ...(conversationId ? { conversation_id: conversationId } : {}),
+      explanation_level: explanationLevel,
+      language,
+    }),
+  });
+}
+
+/**
+ * Get Verified Electronic Contract Notes & Escrow Transactions
+ */
+export async function apiGetTransactions() {
+  return apiRequest('/api/v1/transactions/');
+}
+
+/**
+ * Get APMC Delivery Gate Slot Bookings
+ */
+export async function apiGetMyBookings() {
+  return apiRequest('/api/v1/bookings/my-bookings/');
+}
+
+/**
+ * Create a Delivery Slot Booking
+ */
+export async function apiCreateSlotBooking(slotId, commodityCode, quantityQuintals, vehicleNumber, driverPhone) {
+  return apiRequest('/api/v1/bookings/create/', {
+    method: 'POST',
+    body: JSON.stringify({
+      slot_id: slotId,
+      commodity_code: commodityCode,
+      quantity_quintals: quantityQuintals,
+      vehicle_number: vehicleNumber,
+      driver_phone: driverPhone || '',
+    }),
+  });
+}
+
+/**
+ * Clear Local Session on Logout
+ */
+export function apiLogout() {
+  localStorage.removeItem('agrimart_access_token');
+  localStorage.removeItem('agrimart_refresh_token');
+  localStorage.removeItem('agrimart_user');
+  localStorage.removeItem('agrimart_user_session');
+}
+
 export { DJANGO_BASE_URL, FASTAPI_BASE_URL };

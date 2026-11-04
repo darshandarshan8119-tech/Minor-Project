@@ -87,6 +87,15 @@ export default function MarketFooter({ onSelectMandiTab }) {
                   <span>Contract Notes &amp; Escrow Settlement</span>
                 </button>
               </li>
+              <li>
+                <button 
+                  onClick={() => onSelectMandiTab && onSelectMandiTab('copilot')} 
+                  className="hover:text-[#C26747] text-[#D4A373] font-semibold flex items-center gap-1.5 transition-colors"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C26747] animate-pulse" />
+                  <span>AgriMart AI Market Copilot</span>
+                </button>
+              </li>
             </ul>
           </div>
 

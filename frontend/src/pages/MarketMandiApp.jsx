@@ -1,7 +1,7 @@
 // src/pages/MarketMandiApp.jsx
 // Post-login Market & Mandi application shell.
 // Restored to the authentic Scandinavian clean light background (bg-[#FBFBF9]).
-// Displays strictly APMC Mandi commodity trading, price charts, order books, and transactions.
+// Displays strictly APMC Mandi commodity trading, price charts, order books, copilot, and transactions.
 // Contains ZERO Store, shopping cart, or equipment rental UI.
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -9,6 +9,9 @@ import MandiTicker from '../components/MandiTicker';
 import MarketNavbar from '../components/MarketNavbar';
 import AgriStockExchangeView from '../components/AgriStockExchangeView';
 import MarketFooter from '../components/MarketFooter';
+import MarketCopilotLauncher from '../components/MarketCopilotLauncher';
+import MarketCopilotPage from './MarketCopilotPage';
+import TransactionsPage from './TransactionsPage';
 
 export default function MarketMandiApp() {
   const navigate = useNavigate();
@@ -17,7 +20,7 @@ export default function MarketMandiApp() {
   // Recover user session from localStorage
   const [user] = useState(() => {
     try {
-      const session = localStorage.getItem('agrimart_user_session');
+      const session = localStorage.getItem('agrimart_user_session') || localStorage.getItem('agrimart_user');
       return session ? JSON.parse(session) : null;
     } catch {
       return null;
@@ -38,10 +41,13 @@ export default function MarketMandiApp() {
     if (path.includes('/lots') || path.includes('/commodities')) return 'lots';
     if (path.includes('/bids') || path.includes('/auctions')) return 'bids';
     if (path.includes('/transactions') || path.includes('/contracts')) return 'contracts';
+    if (path.includes('/copilot')) return 'copilot';
     return 'exchange';
   };
 
   const mandiTab = getTabFromPath(location.pathname);
+  const isCopilotRoute = location.pathname.includes('/copilot');
+  const isTransactionsRoute = location.pathname.includes('/transactions') || location.pathname.includes('/contracts');
 
   const handleTabChange = (newTab) => {
     const tabRouteMap = {
@@ -50,6 +56,7 @@ export default function MarketMandiApp() {
       lots: '/market-mandi/commodities',
       bids: '/market-mandi/bids',
       contracts: '/market-mandi/transactions',
+      copilot: '/market-mandi/copilot',
     };
     navigate(tabRouteMap[newTab] || '/market-mandi/app');
   };
@@ -68,13 +75,29 @@ export default function MarketMandiApp() {
         onSelectMandiTab={handleTabChange}
       />
 
-      {/* MAIN CONTENT: ORIGINAL CLEAN LIGHT AGRISTOCK COMMODITY EXCHANGE */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 pb-16">
-        <AgriStockExchangeView 
-          activeTab={mandiTab} 
-          onTabChange={handleTabChange} 
-        />
+        {isCopilotRoute ? (
+          <MarketCopilotPage 
+            user={user} 
+            onNavigateTab={handleTabChange} 
+          />
+        ) : isTransactionsRoute ? (
+          <TransactionsPage 
+            onReturnToAssistant={() => navigate('/market-mandi/copilot')} 
+          />
+        ) : (
+          <AgriStockExchangeView 
+            activeTab={mandiTab} 
+            onTabChange={handleTabChange} 
+          />
+        )}
       </main>
+
+      {/* FLOATING COPILOT LAUNCHER: Visible on all Market routes except Copilot itself */}
+      {!isCopilotRoute && (
+        <MarketCopilotLauncher />
+      )}
 
       {/* Dedicated Market Footer */}
       <MarketFooter 
