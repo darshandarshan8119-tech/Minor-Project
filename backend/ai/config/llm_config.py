@@ -26,7 +26,22 @@ class LLMConfig:
     timeout_seconds: int = 25
 
     @classmethod
-    def from_env(cls) -> "LLMConfig":
+    def from_env(cls, scope: str = "default") -> "LLMConfig":
+        if scope == "market":
+            provider = os.getenv("MARKET_LLM_PROVIDER", "openrouter").strip().lower()
+            api_key = os.getenv("OPENROUTER_API_KEY")
+            model = os.getenv("OPENROUTER_MODEL", "")
+            base_url = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+            return cls(
+                provider=provider,
+                api_key=api_key,
+                model=model,
+                base_url=base_url,
+                temperature=float(os.getenv("MARKET_LLM_TEMPERATURE", "0.2")),
+                max_tokens=int(os.getenv("MARKET_LLM_MAX_TOKENS", "1500")),
+                timeout_seconds=int(os.getenv("MARKET_LLM_TIMEOUT_SECONDS", "25")),
+            )
+
         provider = os.getenv("LLM_PROVIDER", "rule_based").strip().lower()
         base_url = os.getenv("LLM_BASE_URL")
 

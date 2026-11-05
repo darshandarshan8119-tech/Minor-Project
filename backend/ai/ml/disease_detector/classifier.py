@@ -1,59 +1,97 @@
 from __future__ import annotations
 
+import base64
+import json
+import os
+import urllib.error
+import urllib.request
 from io import BytesIO
 
-import numpy as np
 from PIL import Image, UnidentifiedImageError
 
-from ai.ml.disease_detector.taxonomy import treatment_response
+from ai.ml.disease_detector.taxonomy import DISEASE_CATALOG, treatment_response
 
 
 class DiseaseImageRejected(ValueError):
     pass
 
 
-def _leaf_metrics(image_bytes: bytes) -> dict:
+class DiseaseModelUnavailable(RuntimeError):
+    pass
+
+
+def _validate_image(image_bytes: bytes) -> None:
     try:
-        image = Image.open(BytesIO(image_bytes)).convert("RGB").resize((224, 224))
-    except UnidentifiedImageError as exc:
+        with Image.open(BytesIO(image_bytes)) as image:
+            image.verify()
+    except (UnidentifiedImageError, OSError) as exc:
         raise DiseaseImageRejected("Invalid image payload") from exc
-    pixels = np.asarray(image, dtype=np.float32) / 255.0
-    r = pixels[:, :, 0]
-    g = pixels[:, :, 1]
-    b = pixels[:, :, 2]
-    green_mask = (g > r * 1.08) & (g > b * 1.08)
-    brown_mask = (r > 0.28) & (g > 0.16) & (g < 0.55) & (b < 0.35) & (r >= g)
-    yellow_mask = (r > 0.55) & (g > 0.48) & (b < 0.32)
-    dark_mask = (r < 0.25) & (g < 0.25) & (b < 0.25)
-    return {
-        "green_ratio": float(green_mask.mean()),
-        "brown_ratio": float(brown_mask.mean()),
-        "yellow_ratio": float(yellow_mask.mean()),
-        "dark_ratio": float(dark_mask.mean()),
-        "mean_green": float(g.mean()),
-    }
 
 
 def classify_image(image_bytes: bytes, crop_hint: str | None = None) -> dict:
-    metrics = _leaf_metrics(image_bytes)
-    plant_score = metrics["green_ratio"] + metrics["brown_ratio"] * 0.6 + metrics["yellow_ratio"] * 0.4
-    if plant_score < 0.18:
+    _validate_image(image_bytes)
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+    model = os.getenv("OLLAMA_VISION_MODEL", "")
+    if not model:
+        raise DiseaseModelUnavailable("Ollama vision model is not configured.")
+
+    classes = sorted(DISEASE_CATALOG)
+    schema = {
+        "type": "object",
+        "properties": {
+            "disease_key": {"type": "string", "enum": [*classes, "uncertain"]},
+            "observed_signs": {"type": "string"},
+        },
+        "required": ["disease_key", "observed_signs"],
+        "additionalProperties": False,
+    }
+    prompt = (
+        "Inspect this crop leaf image for visible signs consistent with the supported disease classes. "
+        "Return uncertain if the image is unclear, not a crop leaf, healthy, or does not clearly match one "
+        "of the supported classes. Do not infer a diagnosis from the crop name alone. "
+        f"Crop hint: {crop_hint or 'not provided'}. Supported disease keys: {', '.join(classes)}. "
+        "Describe only visible signs briefly. This is a screening aid, not a confirmed diagnosis."
+    )
+    payload = {
+        "model": model,
+        "stream": False,
+        "format": schema,
+        "messages": [{
+            "role": "user",
+            "content": prompt,
+            "images": [base64.b64encode(image_bytes).decode("ascii")],
+        }],
+        "options": {"temperature": 0},
+    }
+    request = urllib.request.Request(
+        f"{base_url}/api/chat",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=int(os.getenv("OLLAMA_TIMEOUT_SECONDS", "120"))) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
+        raise DiseaseModelUnavailable("Could not reach the configured Ollama vision model.") from exc
+
+    try:
+        answer = json.loads(result["message"]["content"])
+        key = answer["disease_key"]
+        signs = str(answer.get("observed_signs", "")).strip()
+    except (KeyError, TypeError, json.JSONDecodeError) as exc:
+        raise DiseaseModelUnavailable("Ollama returned an unreadable vision response.") from exc
+
+    if key not in DISEASE_CATALOG:
         return {
-            "status": "low_confidence_or_non_plant",
-            "confidence": round(plant_score, 4),
-            "message": "Image does not contain enough plant-like visual features for a reliable diagnosis.",
+            "status": "low_confidence",
+            "message": "The configured vision model could not identify a supported disease from this image.",
         }
 
-    crop = (crop_hint or "").strip().lower()
-    if crop == "rice" or metrics["brown_ratio"] > 0.18 and metrics["green_ratio"] > 0.22:
-        key = "rice_brown_spot"
-    elif crop == "wheat" or metrics["yellow_ratio"] > 0.08:
-        key = "wheat_yellow_rust"
-    else:
-        key = "tomato_early_blight"
-
-    confidence = min(0.94, max(0.36, plant_score + metrics["brown_ratio"] + metrics["yellow_ratio"] * 0.5))
-    response = treatment_response(key, confidence)
-    response["status"] = "success"
-    response["image_metrics"] = metrics
-    return response
+    diagnosis = treatment_response(key, confidence=0)
+    diagnosis.pop("confidence", None)
+    diagnosis["severity"] = None
+    if signs:
+        diagnosis["clinical_symptoms"] = signs
+    diagnosis["status"] = "success"
+    return diagnosis

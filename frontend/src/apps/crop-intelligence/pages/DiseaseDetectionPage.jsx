@@ -8,18 +8,16 @@ import {
   ShieldAlert, Activity, ArrowRight, RefreshCw,
   Leaf, HelpCircle, ShoppingCart, CheckCircle2, Stethoscope, X
 } from 'lucide-react';
-import { SAMPLE_DISEASES } from '../../../data/diseaseData';
 import { apiDetectDisease, apiSymptomLookup } from '../../../services/api';
 
 export default function DiseaseDetectionPage({ onOpenCopilot }) {
   const navigate = useNavigate();
 
-  const [selectedSampleKey, setSelectedSampleKey] = useState('tomato_early_blight');
   const [customFile, setCustomFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(SAMPLE_DISEASES.tomato_early_blight.imgUrl);
+  const [imagePreview, setImagePreview] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [diagnosticResult, setDiagnosticResult] = useState(SAMPLE_DISEASES.tomato_early_blight);
+  const [diagnosticResult, setDiagnosticResult] = useState(null);
   const [activeTab, setActiveTab] = useState('chemical'); // 'chemical' | 'organic' | 'store'
   const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
 
@@ -29,24 +27,12 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
 
   const fileInputRef = useRef(null);
 
-  // Handle Preset Sample Selection
-  const handleSelectSample = (key) => {
-    const sample = SAMPLE_DISEASES[key];
-    if (!sample) return;
-    setSelectedSampleKey(key);
-    setCustomFile(null);
-    setImagePreview(sample.imgUrl);
-    setDiagnosticResult(sample);
-    setErrorMessage('');
-  };
-
   // Handle Custom User Image Upload
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setCustomFile(file);
-    setSelectedSampleKey(null);
     setErrorMessage('');
 
     const reader = new FileReader();
@@ -64,49 +50,43 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
     setErrorMessage('');
 
     try {
-      if (customFile) {
-        // Send real multipart/form-data to Django backend
-        const res = await apiDetectDisease(customFile);
-        if (res.status === 'rejected') {
+      const imageFile = customFile;
+      if (imageFile) {
+        const res = await apiDetectDisease(imageFile);
+        if (res.status === 'rejected' || res.status === 'low_confidence') {
           setDiagnosticResult({
             isRejected: true,
             message: res.message || 'Unable to detect a crop leaf in the uploaded image.',
             recommendation: res.recommendation || 'Please capture a clear, well-lit photo of the affected plant foliage.',
           });
+        } else if (res.status === 'model_unavailable') {
+          setErrorMessage(res.message || 'The local crop vision model is unavailable.');
         } else {
+          const chemical = res.treatment_plan?.chemical_control;
+          const treatments = [
+            chemical?.active_ingredient && chemical?.dosage
+              ? `Apply ${chemical.active_ingredient} (${chemical.dosage}). ${chemical.spray_interval || ''}`.trim()
+              : null,
+            chemical?.withholding_period_days != null
+              ? `Pre-harvest interval: ${chemical.withholding_period_days} days.`
+              : null,
+            ...(res.treatment_plan?.preventive_measures || []),
+          ].filter(Boolean);
           setDiagnosticResult({
             crop: res.crop,
             disease: res.disease_name,
             pathogenType: res.pathogen_type,
             severity: res.severity_level,
-            confidence: `${(res.confidence * 100).toFixed(1)}%`,
+            confidence: res.confidence == null ? null : `${(res.confidence * 100).toFixed(1)}%`,
             symptoms: res.symptoms,
-            treatments: [
-              res.treatment_plan?.chemical_control?.active_ingredient 
-                ? `Apply ${res.treatment_plan.chemical_control.active_ingredient} (${res.treatment_plan.chemical_control.dosage || '2g/L'}). ${res.treatment_plan.chemical_control.spray_interval || ''}` 
-                : 'Follow certified agro-chemical schedule.',
-              `Pre-Harvest Safety Interval (PHI): ${res.treatment_plan?.chemical_control?.withholding_period_days || 7} days before harvest.`,
-              ...(res.treatment_plan?.preventive_measures || []),
-            ],
+            source: 'image',
+            treatments,
             organicAlt: res.treatment_plan?.organic_biological_control?.remedy 
-              ? `${res.treatment_plan.organic_biological_control.remedy} (${res.treatment_plan.organic_biological_control.frequency || 'Weekly'}).` 
-              : 'Apply certified organic neem bio-spray.',
+              ? `${res.treatment_plan.organic_biological_control.remedy}${res.treatment_plan.organic_biological_control.frequency ? ` (${res.treatment_plan.organic_biological_control.frequency}).` : ''}`
+              : null,
             storeRecommendations: res.treatment_plan?.store_recommendations || [],
           });
         }
-      } else if (selectedSampleKey && SAMPLE_DISEASES[selectedSampleKey]) {
-        // Preset sample loaded
-        const sample = SAMPLE_DISEASES[selectedSampleKey];
-        setDiagnosticResult({
-          ...sample,
-          storeRecommendations: [
-            {
-              category: 'Fungicide',
-              search_term: sample.disease.includes('Blight') ? 'Mancozeb' : sample.disease.includes('Rust') ? 'Propiconazole' : 'Fungicide',
-              display_name: sample.disease.includes('Blight') ? 'Mancozeb 75% WP Contact Fungicide' : 'Propiconazole 25% EC Systemic Fungicide',
-            }
-          ]
-        });
       }
     } catch (err) {
       setErrorMessage(err.message || 'Failed to complete disease diagnosis. Please try again.');
@@ -134,15 +114,20 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
           crop: res.crop,
           disease: res.disease,
           pathogenType: res.pathogen,
-          severity: res.severity,
-          confidence: `${(res.confidence * 100).toFixed(1)}% (Symptom Match)`,
+          severity: null,
+          confidence: null,
+          source: 'symptoms',
           symptoms: res.clinical_symptoms,
           treatments: [
-            `Active Control: ${res.treatment?.chemical?.active_ingredient || 'Standard ICAR Fungicide'} (@ ${res.treatment?.chemical?.dosage || '2g/L'}).`,
-            `Application Protocol: ${res.treatment?.chemical?.spray_interval || 'Repeat after 10-14 days upon lesion appearance.'}`,
+            ...(res.treatment?.chemical?.active_ingredient && res.treatment?.chemical?.dosage
+              ? [`Active Control: ${res.treatment.chemical.active_ingredient} (@ ${res.treatment.chemical.dosage}).`]
+              : []),
+            ...(res.treatment?.chemical?.spray_interval ? [`Application Protocol: ${res.treatment.chemical.spray_interval}`] : []),
             ...(res.treatment?.cultural_practices || []),
           ],
-          organicAlt: `${res.treatment?.organic?.remedy || 'Bio-fungicide spray'} (${res.treatment?.organic?.frequency || 'Every 7 days'}).`,
+          organicAlt: res.treatment?.organic?.remedy
+            ? `${res.treatment.organic.remedy}${res.treatment.organic.frequency ? ` (${res.treatment.organic.frequency}).` : ''}`
+            : null,
           storeRecommendations: res.store_recommendations || [],
         });
       }
@@ -174,7 +159,7 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
               Crop Disease Detection &amp; Agronomic Clinic
             </h1>
             <p className="text-sm text-[#5A5A5A] font-sans mt-1 max-w-2xl">
-              Upload leaf photographs for neural identification of fungal blights, rusts, and viral infections, complete with verified ICAR/CIB-approved chemical controls and organic remedies.
+              Upload a crop leaf image for assessment by your configured local vision model. Results are limited to supported disease classes and existing agronomic guidance.
             </p>
           </div>
 
@@ -185,18 +170,6 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
             >
               <Stethoscope className="w-3.5 h-3.5 text-[#C26747]" />
               <span>Symptom Questionnaire</span>
-            </button>
-            <button
-              onClick={() => handleSelectSample('healthy_rice')}
-              className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-[#F5F4F0] hover:bg-[#EBE8E2] text-[#121212] border border-black/[0.06] transition-all cursor-pointer"
-            >
-              Test Healthy
-            </button>
-            <button
-              onClick={() => handleSelectSample('tomato_early_blight')}
-              className="px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-[#C26747] text-white hover:bg-[#A85233] transition-all shadow-xs cursor-pointer"
-            >
-              Test Blight Outbreak
             </button>
           </div>
         </div>
@@ -294,7 +267,7 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
 
               <button
                 onClick={handleRunScan}
-                disabled={isScanning}
+                disabled={isScanning || !customFile}
                 className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-[#121212] hover:bg-[#252525] text-xs font-extrabold text-white shadow-md transition-all cursor-pointer disabled:opacity-50"
               >
                 {isScanning ? (
@@ -309,42 +282,6 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
                   </>
                 )}
               </button>
-            </div>
-          </div>
-
-          {/* Quick Benchmark Specimen Library */}
-          <div className="rounded-3xl p-5 border border-black/[0.07] bg-white shadow-xs">
-            <span className="text-xs font-mono font-bold text-[#787774] uppercase tracking-wider block mb-3">
-              Standard Verified Pathology Samples
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {Object.keys(SAMPLE_DISEASES).map((key) => {
-                const item = SAMPLE_DISEASES[key];
-                const isSelected = selectedSampleKey === key;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => handleSelectSample(key)}
-                    className={`p-2.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
-                      isSelected 
-                        ? 'bg-[#121212] text-white border-[#121212] shadow-sm' 
-                        : 'bg-[#FBFBF9] hover:bg-[#F2F0EB] border-black/[0.05] text-[#121212]'
-                    }`}
-                  >
-                    <img 
-                      src={item.imgUrl} 
-                      alt={item.crop} 
-                      className="w-9 h-9 rounded-xl object-cover shrink-0 border border-white/20"
-                    />
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold truncate leading-tight">{item.crop.split('(')[0]}</p>
-                      <p className={`text-[10px] truncate ${isSelected ? 'text-white/70' : 'text-[#787774]'}`}>
-                        {item.disease.split('(')[0]}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </div>
 
@@ -382,11 +319,13 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#121212] text-white">
-                      ICAR Lab Protocol 2026
+                      {diagnosticResult.source === 'symptoms' ? 'Symptom-based assessment' : 'Local vision model assessment'}
                     </span>
-                    <span className="text-[10px] font-mono uppercase font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
-                      {diagnosticResult.severity || 'Moderate'}
-                    </span>
+                    {diagnosticResult.severity && (
+                      <span className="text-[10px] font-mono uppercase font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                        {diagnosticResult.severity}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="text-xl sm:text-2xl font-black font-heading text-[#121212]">
@@ -398,20 +337,28 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
                 </div>
 
                 {/* Confidence Badge */}
-                <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-between p-3 rounded-2xl bg-[#FAF9F5] border border-black/[0.06]">
-                  <span className="text-[10px] font-mono uppercase text-[#787774]">Pathology Match</span>
-                  <span className="text-lg sm:text-2xl font-black font-heading text-[#C26747]">
-                    {diagnosticResult.confidence}
-                  </span>
-                </div>
+                {diagnosticResult.confidence && (
+                  <div className="shrink-0 flex sm:flex-col items-center sm:items-end justify-between p-3 rounded-2xl bg-[#FAF9F5] border border-black/[0.06]">
+                    <span className="text-[10px] font-mono uppercase text-[#787774]">Assessment match</span>
+                    <span className="text-lg sm:text-2xl font-black font-heading text-[#C26747]">
+                      {diagnosticResult.confidence}
+                    </span>
+                  </div>
+                )}
               </div>
+
+              {diagnosticResult.source === 'image' && (
+                <p className="text-xs leading-relaxed text-[#5A5A5A]">
+                  This is an AI screening result, not a confirmed diagnosis. Verify the plant condition with a qualified local agronomist before treatment.
+                </p>
+              )}
 
               {/* Pathological Symptoms */}
               {diagnosticResult.symptoms && (
                 <div className="p-4 rounded-2xl bg-[#FAF9F5] border border-black/[0.05] space-y-1.5">
                   <span className="text-[11px] font-mono font-bold uppercase text-[#787774] flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-[#C26747]" />
-                    <span>Clinical Symptoms &amp; Visual Indicators</span>
+                    <span>{diagnosticResult.source === 'symptoms' ? 'Selected symptoms and assessment' : 'Model-described visible signs'}</span>
                   </span>
                   <p className="text-xs text-[#2A2A2A] font-sans leading-relaxed">
                     {diagnosticResult.symptoms}
@@ -459,7 +406,7 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
                       </div>
                     ))}
                   </div>
-                ) : (
+                ) : diagnosticResult.organicAlt ? (
                   <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 text-emerald-950 space-y-2">
                     <div className="flex items-center gap-2 text-xs font-bold text-emerald-800">
                       <ShieldAlert className="w-4 h-4 text-emerald-600" />
@@ -469,7 +416,7 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
                       {diagnosticResult.organicAlt}
                     </p>
                   </div>
-                )}
+                ) : <p className="text-xs text-[#5A5A5A]">No organic alternative was provided for this assessment.</p>}
               </div>
 
               {/* AG Store Cross-Domain Product Linkage */}
@@ -533,7 +480,7 @@ export default function DiseaseDetectionPage({ onOpenCopilot }) {
               </div>
               <h3 className="font-heading font-extrabold text-lg text-[#121212]">Ready for Leaf Analysis</h3>
               <p className="text-xs text-[#5A5A5A] max-w-sm mx-auto">
-                Click "Run Diagnostic" on the uploaded specimen image to generate a verified plant health assay report.
+                Upload a crop image to request an assessment from your configured local vision model, or use the symptom questionnaire for a separate symptom-based assessment.
               </p>
             </div>
           )}

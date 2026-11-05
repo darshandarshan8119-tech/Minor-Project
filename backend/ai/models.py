@@ -66,10 +66,12 @@ class CropScan(UUIDPrimaryKeyModel, TimeStampedModel):
     crop_name = models.CharField(max_length=120)
     diagnosed_disease = models.CharField(max_length=200)
     pathogen_type = models.CharField(max_length=80)
-    severity = models.CharField(max_length=50)
+    severity = models.CharField(max_length=50, null=True, blank=True)
     confidence = models.DecimalField(
         max_digits=5,
         decimal_places=4,
+        null=True,
+        blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(1)],
     )
     treatment_plan = models.JSONField(default=dict)

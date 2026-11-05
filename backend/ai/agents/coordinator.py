@@ -6,6 +6,7 @@ import re
 from typing import Any, Dict, List, Optional
 
 from ai.agents.guardrails import validate_domain_scope
+from ai.config.llm_config import LLMConfig
 from ai.explanations.service import FarmerExplanationService
 from ai.llm.base import ChatMessage
 from ai.llm.provider_factory import get_llm_provider
@@ -53,7 +54,13 @@ class AgentCoordinator:
     MAX_TOOL_ITERATIONS = 5
 
     def __init__(self, provider=None):
-        self.provider = provider or get_llm_provider()
+        self.config = LLMConfig.from_env(scope="market")
+        self.market_unconfigured = (
+            provider is None
+            and self.config.provider == "openrouter"
+            and not (self.config.api_key and self.config.model)
+        )
+        self.provider = provider or get_llm_provider(self.config)
 
     def run(
         self,
@@ -82,6 +89,9 @@ class AgentCoordinator:
                 "farmer_explanation": "",
             }
 
+        if self.market_unconfigured:
+            return self._unavailable_result()
+
         farmer_buy_result = self._farmer_buy_request(
             user, user_message, explanation_level, language
         )
@@ -108,18 +118,19 @@ class AgentCoordinator:
                 response = active_provider.chat(messages, tools=TOOL_DEFINITIONS)
                 if (
                     not isinstance(active_provider, RuleBasedLLMProvider)
-                    and response.content
-                    and any(err in response.content for err in ["encountered an error", "API key not valid", "request failed", "401", "403", "429"])
+                    and (
+                        response.finish_reason == "error"
+                        or response.content
+                        and any(err in response.content for err in ["encountered an error", "API key not valid", "request failed", "401", "403", "429"])
+                    )
                     and not response.tool_calls
                 ):
-                    logger.warning("External LLM error: %s. Falling back to RuleBasedLLMProvider.", response.content[:100])
-                    active_provider = RuleBasedLLMProvider(getattr(self.provider, "config", None))
-                    response = active_provider.chat(messages, tools=TOOL_DEFINITIONS)
+                    logger.warning("Market LLM request failed: %s", response.content[:100])
+                    return self._unavailable_result()
             except Exception as exc:
                 if not isinstance(active_provider, RuleBasedLLMProvider):
-                    logger.warning("External LLM exception: %s. Falling back to RuleBasedLLMProvider.", exc)
-                    active_provider = RuleBasedLLMProvider(getattr(self.provider, "config", None))
-                    response = active_provider.chat(messages, tools=TOOL_DEFINITIONS)
+                    logger.warning("Market LLM request failed: %s", exc)
+                    return self._unavailable_result()
                 else:
                     raise exc
 
@@ -167,6 +178,16 @@ class AgentCoordinator:
             "card_type": latest_card_type,
             "card_data": latest_card_data,
             "farmer_explanation": "",
+        }
+
+    @staticmethod
+    def _unavailable_result() -> Dict[str, Any]:
+        return {
+            "content": "Market Copilot is unavailable right now. Check the OpenRouter API key, model, and connection, then try again.",
+            "card_type": None,
+            "card_data": {},
+            "farmer_explanation": "",
+            "status": "model_unavailable",
         }
 
     @staticmethod

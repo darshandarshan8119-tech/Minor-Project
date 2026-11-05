@@ -1,10 +1,13 @@
+import json
 from decimal import Decimal
 from io import BytesIO
+
 import pytest
 from PIL import Image
 from rest_framework.test import APIClient
 
 from ai.ml.crop_recommender.agronomic_rules import assess_soil, fertilizer_adjustment
+from ai.ml.disease_detector.classifier import DiseaseModelUnavailable, classify_image
 from ai.ml.disease_detector.fallback_engine import lookup_symptoms
 from ai.models import CropRecommendationRecord, CropScan, SoilReport
 from users.models import CustomUser
@@ -74,46 +77,103 @@ def test_crop_recommendation_api():
 
 
 @pytest.mark.django_db
-def test_disease_detection_api_leaf_scan_and_rejection():
+def test_disease_detection_api_requires_configured_model(monkeypatch):
+    monkeypatch.delenv("OLLAMA_VISION_MODEL", raising=False)
     client = APIClient()
     user = CustomUser.objects.create(phone="9876542222", full_name="Pathology Farmer", role=CustomUser.Role.FARMER)
     client.force_authenticate(user=user)
 
-    # 1. Non-leaf / low-plant image should be honestly rejected
-    dark_image = _generate_synthetic_image(is_leaf=False)
-    dark_file = BytesIO(dark_image)
-    dark_file.name = "dark_photo.jpg"
-
-    res_rejected = client.post(
+    image_file = BytesIO(_generate_synthetic_image())
+    image_file.name = "leaf.jpg"
+    response = client.post(
         "/api/v1/crop-intelligence/disease-scan/",
-        {"image": dark_file},
+        {"image": image_file},
         format="multipart",
         secure=True,
     )
-    assert res_rejected.status_code == 200
-    assert res_rejected.json()["status"] == "rejected"
+    assert response.status_code == 503
+    assert response.json()["status"] == "model_unavailable"
+    assert not CropScan.objects.exists()
 
-    # 2. Plant leaf image should be accepted and diagnosed
-    leaf_image = _generate_synthetic_image(is_leaf=True)
-    leaf_file = BytesIO(leaf_image)
-    leaf_file.name = "infected_leaf.jpg"
+@pytest.mark.django_db
+def test_disease_detection_persists_unscored_model_assessment(monkeypatch):
+    from ai import views
 
-    res_success = client.post(
+    monkeypatch.setattr(views, "classify_image", lambda *_args, **_kwargs: {
+        "status": "success",
+        "crop": "Rice",
+        "disease": "Brown Spot",
+        "pathogen": "Fungal (Bipolaris oryzae)",
+        "severity": None,
+        "clinical_symptoms": "Visible oval lesions.",
+        "treatment": {},
+        "store_recommendations": [],
+    })
+    client = APIClient()
+    user = CustomUser.objects.create(phone="9876542223", full_name="Vision Farmer", role=CustomUser.Role.FARMER)
+    client.force_authenticate(user=user)
+    image_file = BytesIO(_generate_synthetic_image())
+    image_file.name = "leaf.jpg"
+
+    response = client.post(
         "/api/v1/crop-intelligence/disease-scan/",
-        {"image": leaf_file, "crop_hint": "rice"},
+        {"image": image_file, "crop_hint": "rice"},
         format="multipart",
         secure=True,
     )
-    assert res_success.status_code == 201
-    diag = res_success.json()
+    assert response.status_code == 201
+    diag = response.json()
     assert diag["status"] == "success"
-    assert "treatment_plan" in diag
-    assert "chemical_control" in diag["treatment_plan"]
+    assert diag["confidence"] is None
+    assert diag["severity_level"] is None
 
-    # Verify DB persistence
     scan = CropScan.objects.get(id=diag["scan_id"])
     assert scan.user == user
-    assert scan.crop_name != ""
+    assert scan.confidence is None
+    assert scan.severity is None
+
+
+def test_ollama_vision_request_uses_image_and_supported_taxonomy(monkeypatch):
+    from ai.ml.disease_detector import classifier
+
+    monkeypatch.setenv("OLLAMA_VISION_MODEL", "qwen-vision:local")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://ollama.test")
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self):
+            answer = {"disease_key": "rice_brown_spot", "observed_signs": "Oval brown lesions."}
+            return json.dumps({"message": {"content": json.dumps(answer)}}).encode()
+
+    observed = {}
+
+    def fake_urlopen(request, timeout):
+        observed["url"] = request.full_url
+        observed["payload"] = json.loads(request.data)
+        observed["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr(classifier.urllib.request, "urlopen", fake_urlopen)
+    result = classify_image(_generate_synthetic_image(), crop_hint="Rice")
+
+    assert observed["url"] == "http://ollama.test/api/chat"
+    assert observed["payload"]["model"] == "qwen-vision:local"
+    assert observed["payload"]["stream"] is False
+    assert observed["payload"]["messages"][0]["images"]
+    assert "confidence" not in result
+    assert result["disease"] == "Brown Spot"
+    assert result["clinical_symptoms"] == "Oval brown lesions."
+
+
+def test_ollama_unconfigured_model_returns_unavailable(monkeypatch):
+    monkeypatch.delenv("OLLAMA_VISION_MODEL", raising=False)
+    with pytest.raises(DiseaseModelUnavailable):
+        classify_image(_generate_synthetic_image())
 
 
 @pytest.mark.django_db

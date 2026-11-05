@@ -64,7 +64,8 @@ def test_auth_login_endpoint_issues_jwt():
 
 
 @pytest.mark.django_db
-def test_assistant_chat_endpoint():
+def test_assistant_chat_endpoint(monkeypatch):
+    monkeypatch.setenv("MARKET_LLM_PROVIDER", "rule_based")
     from decimal import Decimal
     from mandi.models import APMC, Commodity, DailyTicker
     import datetime

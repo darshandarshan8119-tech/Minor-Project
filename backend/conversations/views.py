@@ -62,6 +62,7 @@ class AssistantChatView(APIView):
                 "conversation": ConversationSerializer(conversation).data,
                 "message": MessageSerializer(assistant_message).data,
                 "farmer_explanation": result["farmer_explanation"],
+                "status": result.get("status", "success"),
                 "explanation_level": serializer.validated_data["explanation_level"],
                 "language": serializer.validated_data["language"],
             },

@@ -11,9 +11,7 @@ export default function DiseaseScanCard({ data = {}, onAction }) {
         <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
           Plant Pathology Assay
         </span>
-        <span className="text-[10px] font-mono font-bold text-[#C26747]">
-          Confidence: {data.confidence || '96.8%'}
-        </span>
+        {data.confidence && <span className="text-[10px] font-mono font-bold text-[#C26747]">Confidence: {data.confidence}</span>}
       </div>
 
       <div className="flex items-start gap-3">
@@ -26,12 +24,8 @@ export default function DiseaseScanCard({ data = {}, onAction }) {
         )}
         <div>
           <span className="text-[11px] font-mono text-[#787774] block">{data.crop || 'Crop Leaf'}</span>
-          <h4 className="text-sm font-extrabold font-heading text-[#121212]">
-            {data.diseaseName || 'Early Blight'}
-          </h4>
-          <span className="text-[10px] font-mono text-rose-700 font-bold block mt-0.5">
-            Severity: {data.severity || 'Moderate Infection'}
-          </span>
+          {data.diseaseName && <h4 className="text-sm font-extrabold font-heading text-[#121212]">{data.diseaseName}</h4>}
+          {data.severity && <span className="text-[10px] font-mono text-rose-700 font-bold block mt-0.5">Severity: {data.severity}</span>}
         </div>
       </div>
 

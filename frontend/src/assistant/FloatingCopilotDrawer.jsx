@@ -5,7 +5,6 @@ import {
   MessageSquare, ChevronRight, Scale, Leaf, Sprout, BarChart2 
 } from 'lucide-react';
 import MessageBubble from './MessageBubble';
-import { SAMPLE_DISEASES } from '../data/diseaseData';
 import { SOIL_PRESETS, calculateCropRecommendation } from '../data/cropRecommendationData';
 
 const QUICK_PROMPTS = [
@@ -93,30 +92,11 @@ export default function FloatingCopilotDrawer({
 
       // 1. CROP DISEASE DETECTION INTENT
       if (lower.includes('disease') || lower.includes('leaf') || lower.includes('blight') || lower.includes('rust') || lower.includes('infection') || lower.includes('cure') || lower.includes('diagnos')) {
-        const sampleKey = lower.includes('corn') || lower.includes('maize') ? 'corn_rust'
-          : lower.includes('rice') || lower.includes('paddy') ? 'healthy_rice'
-          : lower.includes('cotton') ? 'cotton_leaf_curl'
-          : lower.includes('potato') ? 'potato_late_blight'
-          : 'tomato_early_blight';
-        const disease = SAMPLE_DISEASES[sampleKey];
-
         const asstMsg = {
           id: `asst-${Date.now()}`,
           role: 'assistant',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          content: `I analyzed plant health symptoms for **${disease.crop}**.\n\nPrimary diagnosis indicates **${disease.disease}** (${disease.confidence} confidence). Review the diagnostic protocol below or upload a photo in our Disease Scanner:`,
-          card: {
-            type: 'disease',
-            data: {
-              crop: disease.crop,
-              diseaseName: disease.disease,
-              confidence: disease.confidence,
-              severity: disease.severity,
-              symptoms: disease.symptoms,
-              chemicalCure: disease.treatments[1] || disease.treatments[0],
-              sampleImg: disease.imgUrl
-            }
-          },
+          content: 'I can’t assess a plant from a text description alone. Upload a leaf photo in Disease Clinic for the configured local vision model, or open the symptom questionnaire for a separate symptom-based assessment.',
           actions: [
             { label: '📷 Open Leaf Disease Clinic', type: 'NAVIGATE_DISEASE' },
             { label: '🌱 Check Soil Health', type: 'NAVIGATE_RECOMMENDATION' }

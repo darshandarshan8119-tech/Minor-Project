@@ -111,6 +111,7 @@ def test_assistant_chat_returns_a_comparison_card(farmer, market_catalog, monkey
     _, commodity = market_catalog
     seed_historical_ticker_series(90)
     monkeypatch.setenv("LLM_PROVIDER", "rule_based")
+    monkeypatch.setenv("MARKET_LLM_PROVIDER", "rule_based")
     client = APIClient()
     client.force_authenticate(farmer)
     response = client.post(
@@ -123,6 +124,20 @@ def test_assistant_chat_returns_a_comparison_card(farmer, market_catalog, monkey
     assert response.data["message"]["card_type"] == "comparison"
     assert response.data["message"]["card_data"]["mandis"]
     assert response.data["farmer_explanation"]
+
+
+def test_market_copilot_reports_missing_openrouter_configuration(monkeypatch):
+    from types import SimpleNamespace
+
+    from ai.agents.coordinator import AgentCoordinator
+
+    monkeypatch.setenv("MARKET_LLM_PROVIDER", "openrouter")
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("OPENROUTER_MODEL", raising=False)
+    result = AgentCoordinator().run(SimpleNamespace(role="farmer"), "What is the current wheat price?")
+
+    assert result["status"] == "model_unavailable"
+    assert "OpenRouter" in result["content"]
 
 
 @pytest.mark.django_db

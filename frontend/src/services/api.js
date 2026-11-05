@@ -193,7 +193,7 @@ async function apiUploadRequest(endpoint, formData) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errorMsg = errorData.error || errorData.detail || `Upload failed with status ${response.status}`;
+    const errorMsg = errorData.error || errorData.detail || errorData.message || `Upload failed with status ${response.status}`;
     throw new Error(errorMsg);
   }
 

@@ -1,7 +1,8 @@
 from decimal import Decimal
+
 from rest_framework import status
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +13,11 @@ from ai.ml.crop_recommender.agronomic_rules import (
     fertilizer_adjustment,
     market_linkage,
 )
-from ai.ml.disease_detector.classifier import classify_image, DiseaseImageRejected
+from ai.ml.disease_detector.classifier import (
+    DiseaseImageRejected,
+    DiseaseModelUnavailable,
+    classify_image,
+)
 from ai.ml.disease_detector.fallback_engine import lookup_symptoms
 from ai.ml.ocr.report_parser import parse_soil_report
 from ai.models import CropRecommendationRecord, CropScan, SoilReport
@@ -137,8 +142,7 @@ class CropRecommendationView(APIView):
 
 class DiseaseDetectionView(APIView):
     """
-    Inspects plant foliage image uploads, validates leaf presence via visual heuristics,
-    classifies disease pathology, and outputs ICAR/CIB verified chemical & organic control protocols.
+    Submits plant foliage images to the configured Ollama vision model.
     """
     parser_classes = [MultiPartParser, FormParser]
     permission_classes = [AllowAny]
@@ -170,14 +174,18 @@ class DiseaseDetectionView(APIView):
             diagnosis = classify_image(image_bytes, crop_hint=crop_hint)
         except DiseaseImageRejected as exc:
             return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except DiseaseModelUnavailable as exc:
+            return Response(
+                {"status": "model_unavailable", "message": str(exc)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
         user = request.user if request.user.is_authenticated else None
 
-        if diagnosis.get("status") == "low_confidence_or_non_plant":
+        if diagnosis.get("status") == "low_confidence":
             return Response(
                 {
-                    "status": "rejected",
-                    "confidence": diagnosis.get("confidence", 0.0),
+                    "status": "low_confidence",
                     "message": diagnosis.get("message", "Unable to detect plant leaf in uploaded image."),
                     "recommendation": "Please upload a clear, well-lit photo of the infected crop leaf.",
                 },
@@ -196,8 +204,10 @@ class DiseaseDetectionView(APIView):
         crop_name = diagnosis.get("crop") or "Unknown Crop"
         diagnosed_disease = diagnosis.get("disease") or diagnosis.get("disease_name") or "Unknown Disease"
         pathogen_type = diagnosis.get("pathogen") or diagnosis.get("pathogen_type") or "Pathogen Unspecified"
-        severity = diagnosis.get("severity") or diagnosis.get("severity_level") or "Moderate"
-        confidence_val = Decimal(str(round(float(diagnosis.get("confidence", 0.85)), 4)))
+        severity = diagnosis.get("severity") or diagnosis.get("severity_level") or None
+        confidence_val = diagnosis.get("confidence")
+        if confidence_val is not None:
+            confidence_val = Decimal(str(round(float(confidence_val), 4)))
 
         scan = CropScan.objects.create(
             user=user,
@@ -218,8 +228,8 @@ class DiseaseDetectionView(APIView):
                 "crop": crop_name,
                 "disease_name": diagnosed_disease,
                 "pathogen_type": pathogen_type,
-                "severity_level": severity,
-                "confidence": float(scan.confidence),
+                "severity_level": scan.severity or None,
+                "confidence": float(scan.confidence) if scan.confidence is not None else None,
                 "symptoms": diagnosis.get("clinical_symptoms") or diagnosis.get("symptoms", ""),
                 "treatment_plan": treatment_plan,
                 "created_at": scan.created_at.isoformat(),
