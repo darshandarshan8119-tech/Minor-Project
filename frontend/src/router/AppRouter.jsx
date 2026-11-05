@@ -5,7 +5,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LandingWrapper from '../pages/LandingWrapper';
-import LoginPage from '../pages/LoginPage';
+import StoreLoginPage from '../pages/StoreLoginPage';
+import MarketLoginPage from '../pages/MarketLoginPage';
 import StoreRentalApp from '../pages/StoreRentalApp';
 import MarketMandiApp from '../pages/MarketMandiApp';
 import CropIntelligenceApp from '../apps/crop-intelligence/CropIntelligenceApp';
@@ -22,8 +23,8 @@ export default function AppRouter() {
           AG STORE & RENTALS MODULE (/store-rental/*)
           ========================================================== */}
       <Route path="/store-rental" element={<Navigate to="/store-rental/app" replace />} />
-      <Route path="/store-rental/login" element={<LoginPage />} />
-      <Route path="/store-rental/register" element={<LoginPage />} />
+      <Route path="/store-rental/login" element={<StoreLoginPage />} />
+      <Route path="/store-rental/register" element={<StoreLoginPage />} />
       <Route path="/store-rental/app" element={<StoreRentalApp />} />
       <Route path="/store-rental/store" element={<StoreRentalApp />} />
       <Route path="/store-rental/products" element={<StoreRentalApp />} />
@@ -46,8 +47,8 @@ export default function AppRouter() {
           AG MARKET & MANDI MODULE (/market-mandi/*)
           ========================================================== */}
       <Route path="/market-mandi" element={<Navigate to="/market-mandi/app" replace />} />
-      <Route path="/market-mandi/login" element={<LoginPage />} />
-      <Route path="/market-mandi/register" element={<LoginPage />} />
+      <Route path="/market-mandi/login" element={<MarketLoginPage />} />
+      <Route path="/market-mandi/register" element={<MarketLoginPage />} />
       <Route path="/market-mandi/app" element={<MarketMandiApp />} />
       <Route path="/market-mandi/terminal" element={<MarketMandiApp />} />
       <Route path="/market-mandi/commodities" element={<MarketMandiApp />} />

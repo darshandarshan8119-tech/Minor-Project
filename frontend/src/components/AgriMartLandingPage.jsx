@@ -216,12 +216,16 @@ export default function AgriMartLandingPage({ onEnterPlatform, onNavigateRoute }
       <header className="sticky top-0 z-40 bg-[#FBFBF9]/92 backdrop-blur-md border-b border-black/[0.06] transition-all">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
           
-          {/* Brand Mark with Dominant AG Monogram */}
+          {/* Brand Mark with Official AgriMart Parent Logo */}
           <div 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <AGMonogram className="w-10 h-10 shadow-md group-hover:scale-105 transition-transform" variant="terracotta" />
+            <img 
+              src="/assets/logos/agrimart-parent-logo.png" 
+              alt="AgriMart Official Parent Logo" 
+              className="h-10 w-auto object-contain max-w-[160px] group-hover:scale-105 transition-transform"
+            />
             <div className="flex flex-col">
               <span className="text-2xl font-extrabold tracking-[0.16em] text-[#121212] uppercase font-heading">
                 AGRI<span className="text-[#C26747]">MART</span>
@@ -679,7 +683,11 @@ export default function AgriMartLandingPage({ onEnterPlatform, onNavigateRoute }
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-black/[0.08]">
             <div className="flex items-center gap-3">
-              <AGMonogram className="w-10 h-10 shadow-sm" variant="terracotta" />
+              <img 
+                src="/assets/logos/agrimart-parent-logo.png" 
+                alt="AgriMart Parent Logo" 
+                className="h-10 w-auto object-contain max-w-[150px]"
+              />
               <div>
                 <span className="font-heading font-bold text-base text-[#121212] tracking-wider uppercase block">
                   AGRI<span className="text-[#C26747]">MART</span>
