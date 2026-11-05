@@ -180,18 +180,21 @@ export default function AgriMartLandingPage({ onEnterPlatform, onNavigateRoute }
   ];
 
   const handleRouteClick = (appKey, defaultRoute) => {
+    if (onNavigateRoute) {
+      onNavigateRoute(defaultRoute, appKey);
+      return;
+    }
+    if (onEnterPlatform) {
+      onEnterPlatform(appKey);
+      return;
+    }
+
     if (appKey === 'crop') {
       setActiveModal('crop');
       if (typeof window !== 'undefined' && window.history && window.history.pushState) {
         window.history.pushState(null, '', '#crop-intelligence/login');
       }
       return;
-    }
-
-    if (onNavigateRoute) {
-      onNavigateRoute(defaultRoute, appKey);
-    } else if (onEnterPlatform) {
-      onEnterPlatform(appKey);
     }
   };
 

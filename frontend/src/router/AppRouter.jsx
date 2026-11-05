@@ -8,7 +8,8 @@ import LandingWrapper from '../pages/LandingWrapper';
 import LoginPage from '../pages/LoginPage';
 import StoreRentalApp from '../pages/StoreRentalApp';
 import MarketMandiApp from '../pages/MarketMandiApp';
-import CropPlaceholder from '../pages/CropPlaceholder';
+import CropIntelligenceApp from '../apps/crop-intelligence/CropIntelligenceApp';
+import CropLoginPage from '../apps/crop-intelligence/pages/CropLoginPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 export default function AppRouter() {
@@ -67,11 +68,24 @@ export default function AppRouter() {
       {/* ==========================================================
           AG CROP INTELLIGENCE MODULE (/crop-intelligence/*)
           ========================================================== */}
-      <Route path="/crop-intelligence" element={<CropPlaceholder />} />
-      <Route path="/crop-intelligence/login" element={<CropPlaceholder />} />
-      <Route path="/crop-intelligence/register" element={<CropPlaceholder />} />
-      <Route path="/crop-intelligence/app" element={<CropPlaceholder />} />
-      <Route path="/crop-intelligence/*" element={<CropPlaceholder />} />
+      <Route path="/crop-intelligence" element={<Navigate to="/crop-intelligence/app" replace />} />
+      <Route path="/crop-intelligence/login" element={<CropLoginPage />} />
+      <Route path="/crop-intelligence/register" element={<CropLoginPage />} />
+      <Route path="/crop-intelligence/app" element={<CropIntelligenceApp />} />
+      <Route path="/crop-intelligence/clinic" element={<CropIntelligenceApp />} />
+      <Route path="/crop-intelligence/recommendation" element={<CropIntelligenceApp />} />
+      <Route path="/crop-intelligence/ocr" element={<CropIntelligenceApp />} />
+      <Route path="/crop-intelligence/history" element={<CropIntelligenceApp />} />
+
+      {/* Cross-domain protection: redirect Store & Market paths requested under /crop-intelligence */}
+      <Route path="/crop-intelligence/store" element={<Navigate to="/store-rental/store" replace />} />
+      <Route path="/crop-intelligence/products" element={<Navigate to="/store-rental/products" replace />} />
+      <Route path="/crop-intelligence/cart" element={<Navigate to="/store-rental/cart" replace />} />
+      <Route path="/crop-intelligence/terminal" element={<Navigate to="/market-mandi/terminal" replace />} />
+      <Route path="/crop-intelligence/commodities" element={<Navigate to="/market-mandi/commodities" replace />} />
+      <Route path="/crop-intelligence/apmc" element={<Navigate to="/market-mandi/apmc" replace />} />
+      <Route path="/crop-intelligence/copilot" element={<Navigate to="/market-mandi/copilot" replace />} />
+      <Route path="/crop-intelligence/*" element={<CropIntelligenceApp />} />
 
       {/* 404 Catch-All */}
       <Route path="*" element={<NotFoundPage />} />

@@ -15,6 +15,8 @@ export default function LoginPage() {
   let appModule = 'store-rental';
   if (currentPath.startsWith('/market-mandi')) {
     appModule = 'market-mandi';
+  } else if (currentPath.startsWith('/crop-intelligence')) {
+    appModule = 'crop-intelligence';
   }
 
   const [isTransitioning, setIsTransitioning] = React.useState(false);
@@ -41,6 +43,8 @@ export default function LoginPage() {
       // Navigate to the correct app based on the module
       if (appModule === 'market-mandi') {
         navigate('/market-mandi/app');
+      } else if (appModule === 'crop-intelligence') {
+        navigate('/crop-intelligence/app');
       } else {
         navigate('/store-rental/app');
       }
@@ -51,7 +55,7 @@ export default function LoginPage() {
     <>
       {isTransitioning && (
         <AestheticTransitionLoader 
-          targetMode={appModule === 'market-mandi' ? 'mandi' : 'store'} 
+          targetMode={appModule === 'market-mandi' ? 'mandi' : appModule === 'crop-intelligence' ? 'crop' : 'store'} 
           message={transitionMessage} 
         />
       )}

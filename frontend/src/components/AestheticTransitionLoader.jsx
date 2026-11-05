@@ -1,9 +1,10 @@
 // src/components/AestheticTransitionLoader.jsx
 import React from 'react';
-import { Activity, Tractor, Scale } from 'lucide-react';
+import { Activity, Tractor, Scale, Sprout } from 'lucide-react';
 
 export default function AestheticTransitionLoader({ targetMode, message }) {
   const isMandi = targetMode === 'mandi';
+  const isCrop = targetMode === 'crop';
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#111315]/90 backdrop-blur-xl animate-in fade-in duration-300">
@@ -17,7 +18,9 @@ export default function AestheticTransitionLoader({ targetMode, message }) {
           <div className="absolute inset-1 rounded-full border-t-2 border-r-2 border-[#D97706] animate-spin"></div>
           {/* Central Emblem */}
           <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white shadow-glow">
-            {isMandi ? (
+            {isCrop ? (
+              <Sprout className="w-6 h-6 text-[#65A30D] animate-pulse" />
+            ) : isMandi ? (
               <Scale className="w-6 h-6 text-[#10B981] animate-pulse" />
             ) : (
               <Tractor className="w-6 h-6 text-[#D97706] animate-pulse" />
@@ -28,10 +31,10 @@ export default function AestheticTransitionLoader({ targetMode, message }) {
         {/* Dynamic Status Text */}
         <div className="space-y-1.5">
           <div className="text-[10px] font-mono tracking-[0.25em] text-[#D4A373] uppercase font-bold">
-            {isMandi ? 'APMC Mandi Realtime Exchange' : 'AgriMart Machinery & Inputs'}
+            {isCrop ? 'AgriCrop Agronomy Intelligence' : isMandi ? 'APMC Mandi Realtime Exchange' : 'AgriMart Machinery & Inputs'}
           </div>
           <h3 className="text-lg font-bold font-heading text-white tracking-tight">
-            {message || (isMandi ? 'Connecting to National Mandi Feeds...' : 'Loading Equipment Fleet Telemetry...')}
+            {message || (isCrop ? 'Calibrating Agronomic Diagnostic Matrix...' : isMandi ? 'Connecting to National Mandi Feeds...' : 'Loading Equipment Fleet Telemetry...')}
           </h3>
         </div>
 

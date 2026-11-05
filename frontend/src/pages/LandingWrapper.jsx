@@ -13,7 +13,7 @@ export default function LandingWrapper() {
     } else if (appKey === 'mandi') {
       navigate('/market-mandi/login');
     } else if (appKey === 'crop') {
-      navigate('/crop-intelligence');
+      navigate('/crop-intelligence/login');
     } else if (route) {
       navigate(route);
     }
@@ -25,7 +25,7 @@ export default function LandingWrapper() {
     } else if (appKey === 'mandi') {
       navigate('/market-mandi/login');
     } else if (appKey === 'crop') {
-      navigate('/crop-intelligence');
+      navigate('/crop-intelligence/login');
     }
   };
 

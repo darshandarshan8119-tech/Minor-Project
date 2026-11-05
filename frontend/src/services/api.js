@@ -177,6 +177,89 @@ export async function apiCreateSlotBooking(slotId, commodityCode, quantityQuinta
 }
 
 /**
+ * Helper to execute multipart/form-data upload with authorization
+ */
+async function apiUploadRequest(endpoint, formData) {
+  const token = localStorage.getItem('agrimart_access_token');
+  const headers = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const response = await fetch(`${DJANGO_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const errorMsg = errorData.error || errorData.detail || `Upload failed with status ${response.status}`;
+    throw new Error(errorMsg);
+  }
+
+  return response.json();
+}
+
+/**
+ * AI Crop Intelligence: Disease Detection (Photo Upload)
+ */
+export async function apiDetectDisease(imageFile, cropHint = '') {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  if (cropHint) formData.append('crop_hint', cropHint);
+  return apiUploadRequest('/api/v1/crop-intelligence/disease-scan/', formData);
+}
+
+/**
+ * AI Crop Intelligence: Clinical Symptom Fallback Lookup
+ */
+export async function apiSymptomLookup(crop, symptoms) {
+  return apiRequest('/api/v1/crop-intelligence/symptom-lookup/', {
+    method: 'POST',
+    body: JSON.stringify({ crop, symptoms }),
+  });
+}
+
+/**
+ * AI Crop Intelligence: Soil Chemistry Crop Recommendation
+ */
+export async function apiCropRecommend(payload) {
+  return apiRequest('/api/v1/crop-intelligence/recommend/', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * AI Crop Intelligence: Soil Health Card Upload & Parse
+ */
+export async function apiParseSoilReport(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return apiUploadRequest('/api/v1/crop-intelligence/soil-report/', formData);
+}
+
+/**
+ * AI Crop Intelligence: Confirm Soil Report Extracted Parameters
+ */
+export async function apiConfirmSoilReport(reportId, verifiedParameters) {
+  return apiRequest('/api/v1/crop-intelligence/soil-report/confirm/', {
+    method: 'POST',
+    body: JSON.stringify({
+      report_id: reportId,
+      verified_parameters: verifiedParameters,
+    }),
+  });
+}
+
+/**
+ * AI Crop Intelligence: User History of Scans, Soil Cards, and Recommendations
+ */
+export async function apiGetCropHistory() {
+  return apiRequest('/api/v1/crop-intelligence/history/');
+}
+
+/**
  * Clear Local Session on Logout
  */
 export function apiLogout() {
