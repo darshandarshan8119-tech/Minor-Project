@@ -83,7 +83,7 @@ export default function CropIntelligenceApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBF9] text-[#121212] selection:bg-[#EBE8E2] selection:text-[#121212] font-sans">
+    <div className="min-h-screen flex flex-col bg-[#F4FAF5] text-[#121212] selection:bg-[#C8E6D4] selection:text-[#155B43] font-sans">
       
       {/* Dedicated AG Crop Top Navigation Bar */}
       <CropNavbar

@@ -42,7 +42,7 @@ export default function TractorRentalHub() {
       {/* Section Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-4 border-b border-black/[0.06]">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D97706]/15 border border-[#D97706]/30 text-[#D97706] text-[11px] font-mono font-bold uppercase mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#A85C39]/15 border border-[#A85C39]/30 text-[#A85C39] text-[11px] font-mono font-bold uppercase mb-2">
             <Tractor className="w-3.5 h-3.5" />
             <span>Heavy Machinery &amp; Tractor Fleet</span>
           </div>
@@ -54,8 +54,8 @@ export default function TractorRentalHub() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-semibold text-[#121212] bg-[#F5F4F0] px-4 py-2 rounded-full border border-black/[0.05] self-start md:self-auto">
-          <ShieldCheck className="w-4 h-4 text-[#D97706]" />
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#121212] bg-[#F5EDE4] px-4 py-2 rounded-full border border-[#E8D2C2]/60 self-start md:self-auto">
+          <ShieldCheck className="w-4 h-4 text-[#A85C39]" />
           <span>Full Transit Insurance &amp; Field Replacement Guarantee</span>
         </div>
       </div>

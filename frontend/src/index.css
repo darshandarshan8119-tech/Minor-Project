@@ -112,3 +112,34 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     scroll-behavior: auto !important;
   }
 }
+
+/* =========================================================
+   APPLICATION-SCOPED WORKSPACE THEME VARIABLES
+   ========================================================= */
+
+/* AG Store: Warm Earthy Ivory & Terracotta */
+.ag-store-workspace {
+  --app-bg: #FAF4ED;
+  --app-primary: #A85C39;
+  --app-primary-hover: #8E4828;
+  --app-accent: #C47B54;
+  --app-border: #E8D2C2;
+}
+
+/* AG Market: Clean White, Charcoal, Navy, Amber */
+.ag-market-workspace {
+  --app-bg: #FFFFFF;
+  --app-primary: #073B61;
+  --app-primary-hover: #052A47;
+  --app-accent: #F59E0B;
+  --app-border: #E5EBF0;
+}
+
+/* AG Crop: Botanical Soft Mint & Forest Green */
+.ag-crop-workspace {
+  --app-bg: #F4FAF5;
+  --app-primary: #155B43;
+  --app-primary-hover: #0E4130;
+  --app-accent: #27966F;
+  --app-border: #C8E6D4;
+}

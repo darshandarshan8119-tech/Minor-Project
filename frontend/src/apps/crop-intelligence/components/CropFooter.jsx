@@ -3,7 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
-import AGMonogram from '../../../components/AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function CropFooter({ onSelectTab }) {
   const navigate = useNavigate();
@@ -18,9 +18,9 @@ export default function CropFooter({ onSelectTab }) {
           {/* Mission & Brand */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <AGMonogram className="w-7 h-7 shadow-xs" variant="terracotta" />
+              <img src="/assets/logos/ag-crop-logo-transparent.png" alt="AG Crop" className="w-8 h-8 object-contain" />
               <span className="text-2xl font-black tracking-[0.16em] text-[#FBFBF9] uppercase font-heading">
-                AGRI<span className="text-[#C26747]">CROP</span>
+                AG <span style={{color: '#27966F'}}>CROP</span>
               </span>
             </div>
             <p className="text-xs sm:text-sm text-[#9CA3AF] font-sans leading-relaxed max-w-sm">

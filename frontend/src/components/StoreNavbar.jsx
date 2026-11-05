@@ -7,7 +7,7 @@ import {
   Search, Heart, ShoppingBag, User, ArrowLeft,
   Tractor, ShieldCheck
 } from 'lucide-react';
-import AGMonogram from './AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function StoreNavbar({ 
   user,
@@ -23,7 +23,7 @@ export default function StoreNavbar({
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FBFBF9]/95 backdrop-blur-md border-b border-black/[0.06] transition-all">
+    <header className="sticky top-0 z-40 bg-[#FAF4ED]/95 backdrop-blur-md border-b border-[#E8D2C2] transition-all">
       {/* Main Header Bar */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-8">
         <div className="flex items-center justify-between h-18 gap-4 sm:gap-8">
@@ -43,13 +43,13 @@ export default function StoreNavbar({
               onClick={() => navigate('/store-rental/app')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <AGMonogram className="w-8 h-8 shadow-xs" variant="amber" />
+              <img src="/assets/logos/ag-store-logo-transparent.png" alt="AG Store" className="w-8 h-8 object-contain" />
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-black tracking-tight text-[#1A1A1A] font-heading leading-tight">
-                  Agri<span className="text-[#B45309]">Store</span>
+                <span className="text-xl sm:text-2xl font-black tracking-tight font-heading leading-tight" style={{color: '#A85C39'}}>
+                  AG Store
                 </span>
-                <span className="text-[10px] tracking-widest text-[#787774] uppercase font-mono -mt-0.5">
-                  Farm Inputs &bull; Machinery Fleet
+                <span className="text-[10px] tracking-widest uppercase font-mono -mt-0.5 text-stone-500">
+                  Store &amp; Equipment Rental &bull; Bharat
                 </span>
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function StoreNavbar({
 
             <button
               onClick={onScrollToRentals}
-              className="text-[#B45309] hover:text-[#92400E] font-medium flex items-center gap-1.5 py-1">
+              className="text-[#A85C39] hover:text-[#8E4828] font-medium flex items-center gap-1.5 py-1">
               <Tractor className="w-3.5 h-3.5" />
               <span>Machinery &amp; Fleet Rentals</span>
             </button>

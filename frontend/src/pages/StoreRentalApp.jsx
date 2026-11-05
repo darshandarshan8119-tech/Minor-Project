@@ -163,12 +163,12 @@ export default function StoreRentalApp() {
   const cartTotalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBF9] text-[#121212] selection:bg-[#EBE8E2] selection:text-[#121212] font-sans">
+    <div className="min-h-screen flex flex-col bg-[#FAF4ED] text-[#121212] selection:bg-[#EADBCE] selection:text-[#121212] font-sans">
       
       {/* TOP STRIP: Store village delivery and lab purity banner */}
-      <div className="bg-[#F5F4F0] border-b border-black/[0.05] text-[#55534E] text-xs py-2 px-4 sm:px-8 font-sans flex items-center justify-between">
+      <div className="bg-[#F5EDE4] border-b border-[#E8D2C2]/60 text-[#55534E] text-xs py-2 px-4 sm:px-8 font-sans flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Truck className="w-3.5 h-3.5 text-[#B45309] shrink-0" />
+          <Truck className="w-3.5 h-3.5 text-[#A85C39] shrink-0" />
           <span>Free doorstep village delivery on orders over ₹499 &bull; Cash on Delivery (COD) available across rural India</span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-[11px] text-[#787774]">

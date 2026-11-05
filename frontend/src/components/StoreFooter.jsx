@@ -4,7 +4,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Truck, Tractor, ArrowLeft } from 'lucide-react';
-import AGMonogram from './AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function StoreFooter({ onSelectCategory, onScrollToRentals }) {
   const navigate = useNavigate();
@@ -19,9 +19,9 @@ export default function StoreFooter({ onSelectCategory, onScrollToRentals }) {
           {/* Brand & Mission (Col 1 to 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <AGMonogram className="w-7 h-7 shadow-xs" variant="amber" />
+              <img src="/assets/logos/ag-store-logo-transparent.png" alt="AG Store" className="w-8 h-8 object-contain" />
               <span className="text-2xl font-black tracking-[0.16em] text-[#FBFBF9] uppercase font-heading">
-                AGRI<span className="text-[#C26747]">STORE</span>
+                AG <span style={{color: '#A85C39'}}>STORE</span>
               </span>
             </div>
             <p className="text-xs sm:text-sm text-[#8E8E8E] font-sans leading-relaxed max-w-sm">

@@ -4,7 +4,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck, FileText } from 'lucide-react';
-import AGMonogram from './AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function MarketFooter({ onSelectMandiTab }) {
   const navigate = useNavigate();
@@ -19,9 +19,9 @@ export default function MarketFooter({ onSelectMandiTab }) {
           {/* Brand & Market Mission (Col 1 to 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <AGMonogram className="w-7 h-7 shadow-xs" variant="emerald" />
-              <span className="text-2xl font-black tracking-[0.16em] text-[#FBFBF9] uppercase font-heading">
-                AGRI<span className="text-[#10B981]">MARKET</span>
+              <img src="/assets/logos/ag-market-logo-transparent.png" alt="AG Market" className="w-8 h-8 object-contain" />
+              <span className="text-2xl font-black tracking-[0.16em] text-white uppercase font-heading">
+                AG <span style={{color: '#38BDF8'}}>MARKET</span>
               </span>
             </div>
             <p className="text-xs sm:text-sm text-[#9CA3AF] font-sans leading-relaxed max-w-sm">

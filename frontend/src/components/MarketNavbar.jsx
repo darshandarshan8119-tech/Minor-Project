@@ -7,7 +7,7 @@ import {
   Scale, FileText, ArrowLeft, User, Search, ShieldCheck,
   TrendingUp, Activity, Landmark, Sparkles
 } from 'lucide-react';
-import AGMonogram from './AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function MarketNavbar({ 
   user,
@@ -18,7 +18,7 @@ export default function MarketNavbar({
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FBFBF9]/95 backdrop-blur-md border-b border-black/[0.06] transition-all">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5EBF0] transition-all">
       {/* Main Header Bar */}
       <div className="max-w-[1360px] mx-auto px-4 sm:px-8">
         <div className="flex items-center justify-between h-18 gap-4 sm:gap-8">
@@ -38,13 +38,13 @@ export default function MarketNavbar({
               onClick={() => onSelectMandiTab('exchange')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <AGMonogram className="w-8 h-8 shadow-xs" variant="emerald" />
+              <img src="/assets/logos/ag-market-logo-transparent.png" alt="AG Market" className="h-8 w-8 object-contain" />
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#1A1A1A] font-heading leading-tight">
-                  Agri<span className="text-[#10B981]">Market</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight font-heading leading-tight" style={{color:'#073B61'}}>
+                  AG Market
                 </span>
-                <span className="text-[10px] tracking-widest text-[#787774] uppercase font-mono -mt-0.5">
-                  APMC Mandi &bull; Commodity Terminal
+                <span className="text-[10px] tracking-widest uppercase font-mono -mt-0.5" style={{color:'#50687E'}}>
+                  APMC Mandi Trading &bull; Bharat
                 </span>
               </div>
             </div>
@@ -52,7 +52,7 @@ export default function MarketNavbar({
 
           {/* Minimal Live Radar Pill */}
           <div className="flex items-center bg-[#F2F0EB] px-3.5 py-1.5 rounded-full border border-black/[0.05] shrink-0 gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse" />
             <span className="text-xs font-semibold text-[#1A1A1A] font-heading">
               APMC Live Exchange Radar
             </span>
@@ -74,9 +74,9 @@ export default function MarketNavbar({
 
           {/* User Account & Escrow Telemetry */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#166534] bg-[#10B981]/10 px-3 py-1 rounded-full border border-[#10B981]/20 font-mono font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#10B981]" />
-              <span>Escrow Active</span>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[#073B61] bg-blue-50 px-3 py-1 rounded-full border border-blue-200 font-mono font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#073B61]" />
+              <span>AGMARKNET</span>
             </div>
 
             {/* Trader Profile */}
@@ -172,7 +172,7 @@ export default function MarketNavbar({
           <div className="hidden sm:flex items-center gap-2 text-[11px] font-mono text-[#787774] shrink-0">
             <span>Trading Hours: 09:00 - 17:30 IST</span>
             <span>&bull;</span>
-            <span className="text-[#166534] font-semibold">T+0 Spot Settlement</span>
+            <span className="text-[#073B61] font-semibold">AGMARKNET Data</span>
           </div>
         </div>
 

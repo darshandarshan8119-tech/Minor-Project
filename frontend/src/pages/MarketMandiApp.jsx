@@ -62,7 +62,7 @@ export default function MarketMandiApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBFBF9] text-[#121212] selection:bg-[#EBE8E2] selection:text-[#121212] font-sans">
+    <div className="min-h-screen flex flex-col bg-white text-[#121212] selection:bg-blue-100 selection:text-[#121212] font-sans">
       
       {/* TOP STRIP: APMC Mandi Stock Ticker */}
       <MandiTicker onOpenMandiTerminal={() => handleTabChange('exchange')} />

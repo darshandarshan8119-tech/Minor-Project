@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Leaf, Sprout, FileText, History, ArrowLeft, User 
 } from 'lucide-react';
-import AGMonogram from '../../../components/AGMonogram';
+// AGMonogram replaced by official logo PNG
 
 export default function CropNavbar({ 
   user,
@@ -17,7 +17,7 @@ export default function CropNavbar({
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FBFBF9]/95 backdrop-blur-md border-b border-black/[0.06] transition-all">
+    <header className="sticky top-0 z-40 bg-[#F4FAF5]/95 backdrop-blur-md border-b border-[#C8E6D4] transition-all">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-8">
         
         {/* Main Header Bar */}
@@ -38,22 +38,22 @@ export default function CropNavbar({
               onClick={() => onSelectTab('clinic')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <AGMonogram className="w-8 h-8 shadow-xs" variant="terracotta" />
+              <img src="/assets/logos/ag-crop-logo-transparent.png" alt="AG Crop" className="w-8 h-8 object-contain" />
               <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-bold tracking-tight text-[#1A1A1A] font-heading leading-tight">
-                  Agri<span className="text-[#C26747]">Crop</span>
+                <span className="text-xl sm:text-2xl font-bold tracking-tight font-heading leading-tight" style={{color: '#155B43'}}>
+                  AG Crop
                 </span>
-                <span className="text-[10px] tracking-widest text-[#787774] uppercase font-mono -mt-0.5">
-                  Agronomy Suite &bull; Plant Pathology
+                <span className="text-[10px] tracking-widest text-[#27966F] uppercase font-mono -mt-0.5">
+                  Crop Intelligence Suite &bull; Bharat
                 </span>
               </div>
             </div>
           </div>
 
           {/* Radar Status Badge */}
-          <div className="hidden md:flex items-center bg-[#F2F0EB] px-3.5 py-1.5 rounded-full border border-black/[0.05] shrink-0 gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C26747] animate-pulse" />
-            <span className="text-xs font-semibold text-[#1A1A1A] font-heading">
+          <div className="hidden md:flex items-center bg-[#E8F5E9] px-3.5 py-1.5 rounded-full border border-[#C8E6D4] shrink-0 gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#27966F] animate-pulse" />
+            <span className="text-xs font-semibold text-[#155B43] font-heading">
               ICAR Pathology Calibration Active
             </span>
           </div>
@@ -79,39 +79,39 @@ export default function CropNavbar({
             <button
               onClick={() => onSelectTab('clinic')}
               className={`py-1 relative flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeTab === 'clinic' ? 'text-[#1A1A1A] font-bold' : 'text-[#6B6A66] hover:text-[#1A1A1A]'
+                activeTab === 'clinic' ? 'text-[#155B43] font-bold' : 'text-[#6B6A66] hover:text-[#155B43]'
               }`}
             >
-              <Leaf className="w-3.5 h-3.5 text-[#C26747]" />
+              <Leaf className="w-3.5 h-3.5 text-[#155B43]" />
               <span>Disease Clinic &bull; Leaf Scanner</span>
               {activeTab === 'clinic' && (
-                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#C26747] rounded-full" />
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#155B43] rounded-full" />
               )}
             </button>
 
             <button
               onClick={() => onSelectTab('recommendation')}
               className={`py-1 relative flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeTab === 'recommendation' ? 'text-[#1A1A1A] font-bold' : 'text-[#6B6A66] hover:text-[#1A1A1A]'
+                activeTab === 'recommendation' ? 'text-[#155B43] font-bold' : 'text-[#6B6A66] hover:text-[#155B43]'
               }`}
             >
-              <Sprout className="w-3.5 h-3.5 text-[#65A30D]" />
+              <Sprout className="w-3.5 h-3.5 text-[#27966F]" />
               <span>Soil Chemistry &bull; Crop Matrix</span>
               {activeTab === 'recommendation' && (
-                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#65A30D] rounded-full" />
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#27966F] rounded-full" />
               )}
             </button>
 
             <button
               onClick={() => onSelectTab('ocr')}
               className={`py-1 relative flex items-center gap-1.5 transition-colors cursor-pointer ${
-                activeTab === 'ocr' ? 'text-[#1A1A1A] font-bold' : 'text-[#6B6A66] hover:text-[#1A1A1A]'
+                activeTab === 'ocr' ? 'text-[#155B43] font-bold' : 'text-[#6B6A66] hover:text-[#155B43]'
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-[#0284C7]" />
+              <FileText className="w-3.5 h-3.5 text-[#155B43]" />
               <span>Soil Health Card OCR</span>
               {activeTab === 'ocr' && (
-                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#0284C7] rounded-full" />
+                <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-[#155B43] rounded-full" />
               )}
             </button>
 

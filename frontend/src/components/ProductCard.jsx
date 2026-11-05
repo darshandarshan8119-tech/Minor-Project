@@ -38,10 +38,10 @@ export default function ProductCard({
             onToggleWishlist(product.id);
           }}
           className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center transition-all duration-200 shadow-xs hover:scale-105 ${
-            isWishlisted ? 'text-[#C26747]' : 'text-[#8E8E8E] hover:text-[#121212]'
+            isWishlisted ? 'text-[#A85C39]' : 'text-[#8E8E8E] hover:text-[#121212]'
           }`}
           aria-label="Wishlist">
-          <Heart className={`w-4 h-4 stroke-[1.75] ${isWishlisted ? 'fill-[#C26747]' : ''}`} />
+          <Heart className={`w-4 h-4 stroke-[1.75] ${isWishlisted ? 'fill-[#A85C39]' : ''}`} />
         </button>
 
         {/* Hover Quick-Add Overlay Button */}
@@ -51,7 +51,7 @@ export default function ProductCard({
               e.stopPropagation();
               onAddToCart(product.id);
             }}
-            className="w-full py-2.5 rounded-full bg-[#121212] hover:bg-[#283618] text-white text-xs font-bold font-heading flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-95">
+            className="w-full py-2.5 rounded-full bg-[#121212] hover:bg-[#8E4828] text-white text-xs font-bold font-heading flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-95">
             <span>Add to Cart</span>
             <Plus className="w-3.5 h-3.5 stroke-[2]" />
           </button>
@@ -69,7 +69,7 @@ export default function ProductCard({
           {/* Title */}
           <h3 
             onClick={() => onQuickView(product)}
-            className="font-heading font-extrabold text-sm sm:text-base text-[#121212] hover:text-[#C26747] transition-colors leading-snug line-clamp-2 cursor-pointer mb-2">
+            className="font-heading font-extrabold text-sm sm:text-base text-[#121212] hover:text-[#A85C39] transition-colors leading-snug line-clamp-2 cursor-pointer mb-2">
             {product.name}
           </h3>
         </div>
