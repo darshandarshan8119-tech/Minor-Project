@@ -4,11 +4,11 @@
   --color-canvas: #FBFBF9;
   --color-canvas-subtle: #F5F4F0;
   --color-canvas-card: #FFFFFF;
-  
+
   --color-ink: #121212;
   --color-ink-secondary: #5A5A5A;
   --color-ink-muted: #8E8E8E;
-  
+
   --color-accent-terracotta: #C26747;
   --color-accent-amber: #D4A373;
   --color-accent-deep: #283618;
@@ -126,13 +126,107 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   --app-border: #E8D2C2;
 }
 
-/* AG Market: Clean White, Charcoal, Navy, Amber */
+/* AG Market: Professional Agricultural Commodity Exchange Design System */
 .ag-market-workspace {
-  --app-bg: #FFFFFF;
-  --app-primary: #073B61;
-  --app-primary-hover: #052A47;
-  --app-accent: #F59E0B;
-  --app-border: #E5EBF0;
+  --market-brand: #315F7D;
+  --market-brand-hover: #244B65;
+  --market-background: #F7F9FA;
+  --market-background-subtle: #F1F5F7;
+  --market-surface: #FFFFFF;
+  --market-surface-muted: #EEF2F4;
+
+  --text-primary: #17191C;
+  --text-secondary: #62676D;
+  --text-muted: #92979D;
+  --text-label: #70777F;
+
+  --market-positive: #287653;
+  --market-positive-bg: #E8F1EC;
+  --market-negative: #B65D5D;
+  --market-negative-bg: #F5EBEB;
+  --market-warning: #9A713D;
+  --market-warning-bg: #F4EFE6;
+
+  --border-subtle: #E1E7EA;
+  --border-strong: #C8D2D8;
+
+  --radius-card: 1.5rem;
+  --radius-control: 0.75rem;
+
+  --shadow-card: 0 2px 8px -1px rgba(36, 63, 79, 0.045), 0 1px 3px -1px rgba(36, 63, 79, 0.025);
+  --shadow-hover: 0 12px 24px -4px rgba(36, 63, 79, 0.075), 0 4px 8px -2px rgba(36, 63, 79, 0.035);
+}
+
+/* Keep legacy Market utility classes aligned with the exchange palette. */
+.ag-market-workspace [class*="text-[#155E91]"],
+.ag-market-workspace [class*="text-[#155E91]/"] { color: var(--market-brand) !important; }
+.ag-market-workspace [class~="bg-[#155E91]"] { background-color: var(--market-brand) !important; }
+.ag-market-workspace [class*="border-[#155E91]"] { border-color: var(--market-brand) !important; }
+.ag-market-workspace [class*="hover:bg-[#155E91]"]:hover { background-color: var(--market-brand-hover) !important; }
+.ag-market-workspace [class*="text-[#16845B]"],
+.ag-market-workspace [class*="text-[#16845B]/"] { color: var(--market-positive) !important; }
+.ag-market-workspace [class~="bg-[#16845B]"] { background-color: var(--market-positive) !important; }
+.ag-market-workspace [class*="text-[#D94D4D]"] { color: var(--market-negative) !important; }
+.ag-market-workspace [class*="text-[#C47A37]"],
+.ag-market-workspace [class*="text-[#C47A37]/"] { color: var(--market-warning) !important; }
+.ag-market-workspace [class~="bg-[#C47A37]"] { background-color: var(--market-warning) !important; }
+.ag-market-workspace [class*="hover:bg-[#C26747]"]:hover { background-color: var(--market-brand-hover) !important; }
+.ag-market-workspace [class~="bg-[#FFF4E5]"] { background-color: var(--market-warning-bg) !important; }
+.ag-market-workspace [class~="bg-[#E7F5EE]"] { background-color: var(--market-positive-bg) !important; }
+.ag-market-workspace [class~="bg-[#F8FAFB]"] { background-color: var(--market-background-subtle) !important; }
+.ag-market-workspace [class*="border-[#E8E9E7]"] { border-color: var(--border-subtle) !important; }
+.ag-market-workspace [class~="bg-[#F5F5F2]"],
+.ag-market-workspace [class~="bg-[#FAF9F5]"],
+.ag-market-workspace [class~="bg-[#F8F7F4]"],
+.ag-market-workspace [class~="bg-[#F7F6F2]"] { background-color: var(--market-background-subtle) !important; }
+.ag-market-workspace [class*="border-[#E5E2DC]"],
+.ag-market-workspace [class*="border-[#E8E5DF]"] { border-color: var(--border-subtle) !important; }
+.ag-market-workspace [class*="text-[#D94D4D]"],
+.ag-market-workspace [class*="text-[#E05252]"],
+.ag-market-workspace [class*="text-[#EF4444]"] { color: var(--market-negative) !important; }
+.ag-market-workspace [class~="bg-[#FCEAEA]"],
+.ag-market-workspace [class~="bg-[#FEF2F2]"] { background-color: var(--market-negative-bg) !important; }
+.ag-market-workspace button[class~="bg-[#17191C]"],
+.ag-market-workspace a[class~="bg-[#17191C]"],
+.ag-market-workspace button[class~="bg-[#121212]"],
+.ag-market-workspace a[class~="bg-[#121212]"] { background-color: var(--market-brand) !important; }
+.ag-market-workspace button[class~="bg-[#17191C]"]:hover,
+.ag-market-workspace a[class~="bg-[#17191C]"]:hover,
+.ag-market-workspace button[class~="bg-[#121212]"]:hover,
+.ag-market-workspace a[class~="bg-[#121212]"]:hover,
+.ag-market-workspace button[class~="hover:bg-[#121212]"]:hover,
+.ag-market-workspace a[class~="hover:bg-[#121212]"]:hover { background-color: var(--market-brand-hover) !important; }
+.ag-market-workspace [class*="focus:border-[#155E91]"]:focus { border-color: var(--market-brand) !important; }
+.ag-market-workspace button:focus-visible,
+.ag-market-workspace a:focus-visible,
+.ag-market-workspace input:focus-visible,
+.ag-market-workspace select:focus-visible { outline: 2px solid var(--market-brand); outline-offset: 2px; }
+
+.market-card {
+  background-color: var(--market-surface, #FFFFFF);
+  border: 1px solid var(--border-subtle, #E8E9E7);
+  box-shadow: var(--shadow-card);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.market-card:hover {
+  border-color: rgba(49, 95, 125, 0.28);
+  box-shadow: var(--shadow-hover);
+}
+
+.market-badge-pos {
+  background-color: var(--market-positive-bg, #E7F5EE);
+  color: var(--market-positive, #16845B);
+}
+
+.market-badge-neg {
+  background-color: var(--market-negative-bg, #FCEAEA);
+  color: var(--market-negative, #D94D4D);
+}
+
+.market-badge-warn {
+  background-color: var(--market-warning-bg, #FFF4E5);
+  color: var(--market-warning, #C47A37);
 }
 
 /* AG Crop: Botanical Soft Mint & Forest Green */

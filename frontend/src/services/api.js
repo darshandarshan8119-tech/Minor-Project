@@ -1,24 +1,59 @@
 // src/services/api.js
 // AgriMart Unified API Client for Django Core (Port 8000) & FastAPI Realtime (Port 8001)
 
-const DJANGO_BASE_URL = import.meta.env.VITE_DJANGO_URL || 'http://127.0.0.1:8000';
+const DJANGO_BASE_URL = import.meta.env.VITE_DJANGO_URL || 'http://127.0.0.1:8002';
 const FASTAPI_BASE_URL = import.meta.env.VITE_FASTAPI_URL || 'http://127.0.0.1:8001';
+
+async function refreshAccessToken() {
+  const refresh = localStorage.getItem('agrimart_refresh_token');
+  if (!refresh) return null;
+
+  try {
+    const response = await fetch(`${DJANGO_BASE_URL}/api/v1/auth/token/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh }),
+    });
+    if (!response.ok) return null;
+
+    const tokens = await response.json();
+    if (!tokens.access) return null;
+    localStorage.setItem('agrimart_access_token', tokens.access);
+    if (tokens.refresh) localStorage.setItem('agrimart_refresh_token', tokens.refresh);
+    return tokens.access;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchWithAuthRecovery(endpoint, options, isUpload = false) {
+  const request = (token) => {
+    const headers = {
+      ...(!isUpload ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    };
+    return fetch(`${DJANGO_BASE_URL}${endpoint}`, { ...options, headers });
+  };
+
+  const originalToken = localStorage.getItem('agrimart_access_token');
+  const response = await request(originalToken);
+  if (response.status !== 401 || !originalToken) return response;
+
+  const refreshedToken = await refreshAccessToken();
+  if (refreshedToken) return request(refreshedToken);
+
+  localStorage.removeItem('agrimart_access_token');
+  localStorage.removeItem('agrimart_refresh_token');
+  localStorage.removeItem('agrimart_user');
+  return request(null);
+}
 
 /**
  * Helper to execute fetch with JSON headers and authorization if present
  */
 async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('agrimart_access_token');
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...options.headers,
-  };
-
-  const response = await fetch(`${DJANGO_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const response = await fetchWithAuthRecovery(endpoint, options);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -180,16 +215,10 @@ export async function apiCreateSlotBooking(slotId, commodityCode, quantityQuinta
  * Helper to execute multipart/form-data upload with authorization
  */
 async function apiUploadRequest(endpoint, formData) {
-  const token = localStorage.getItem('agrimart_access_token');
-  const headers = {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-
-  const response = await fetch(`${DJANGO_BASE_URL}${endpoint}`, {
+  const response = await fetchWithAuthRecovery(endpoint, {
     method: 'POST',
-    headers,
     body: formData,
-  });
+  }, true);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

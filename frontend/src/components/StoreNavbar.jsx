@@ -43,13 +43,13 @@ export default function StoreNavbar({
               onClick={() => navigate('/store-rental/app')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <img src="/assets/logos/ag-store-logo-transparent.png" alt="AG Store" className="w-8 h-8 object-contain" />
+              <img src="/assets/logos/official-ag-store-icon.png" alt="AG Store Official Logo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
                 <span className="text-xl sm:text-2xl font-black tracking-tight font-heading leading-tight" style={{color: '#A85C39'}}>
                   AG Store
                 </span>
-                <span className="text-[10px] tracking-widest uppercase font-mono -mt-0.5 text-stone-500">
-                  Store &amp; Equipment Rental &bull; Bharat
+                <span className="text-[9px] tracking-wider uppercase font-mono font-bold -mt-0.5 text-stone-500">
+                  Inputs &bull; Machinery &bull; Rental
                 </span>
               </div>
             </div>

@@ -19,16 +19,16 @@ export default function MarketFooter({ onSelectMandiTab }) {
           {/* Brand & Market Mission (Col 1 to 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <img src="/assets/logos/ag-market-logo-transparent.png" alt="AG Market" className="w-8 h-8 object-contain" />
-              <span className="text-2xl font-black tracking-[0.16em] text-white uppercase font-heading">
-                AG <span style={{color: '#38BDF8'}}>MARKET</span>
+              <img src="/assets/logos/official-ag-market-icon.png" alt="AG Market" className="w-8 h-8 object-contain drop-shadow-2xs" />
+              <span className="text-2xl font-black tracking-[0.0em] text-white uppercase font-heading">
+                AG <span className="text-[#79A9C8]">MARKET</span>
               </span>
             </div>
             <p className="text-xs sm:text-sm text-[#9CA3AF] font-sans leading-relaxed max-w-sm">
               Autonomous agricultural commodity exchange and APMC wholesale trading terminal connecting verified farmers and merchant buyers across national regulated mandis.
             </p>
-            <div className="pt-2 text-[11px] text-[#10B981] font-semibold flex items-center gap-2 font-mono">
-              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
+            <div className="pt-2 text-[11px] text-[#16845B] font-semibold flex items-center gap-2 font-mono">
+              <ShieldCheck className="w-4 h-4 text-[#16845B]" />
               <span>e-NAM Integrated &bull; AGMARKNET Certified Telemetry</span>
             </div>
             <button
@@ -81,7 +81,7 @@ export default function MarketFooter({ onSelectMandiTab }) {
               <li>
                 <button 
                   onClick={() => onSelectMandiTab && onSelectMandiTab('contracts')} 
-                  className="hover:text-[#10B981] text-[#10B981] font-semibold flex items-center gap-1.5 transition-colors"
+                  className="hover:text-[#16845B] text-[#16845B] font-semibold flex items-center gap-1.5 transition-colors"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>Contract Notes &amp; Escrow Settlement</span>
@@ -90,9 +90,9 @@ export default function MarketFooter({ onSelectMandiTab }) {
               <li>
                 <button 
                   onClick={() => onSelectMandiTab && onSelectMandiTab('copilot')} 
-                  className="hover:text-[#C26747] text-[#D4A373] font-semibold flex items-center gap-1.5 transition-colors"
+                  className="hover:text-[#C47A37] text-[#C47A37] font-semibold flex items-center gap-1.5 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#C26747] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C47A37] animate-pulse" />
                   <span>AgriMart AI Market Copilot</span>
                 </button>
               </li>

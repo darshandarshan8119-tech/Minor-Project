@@ -19,7 +19,7 @@ export default function StoreFooter({ onSelectCategory, onScrollToRentals }) {
           {/* Brand & Mission (Col 1 to 4) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <img src="/assets/logos/ag-store-logo-transparent.png" alt="AG Store" className="w-8 h-8 object-contain" />
+              <img src="/assets/logos/official-ag-store-icon.png" alt="AG Store" className="w-8 h-8 object-contain drop-shadow-2xs" />
               <span className="text-2xl font-black tracking-[0.16em] text-[#FBFBF9] uppercase font-heading">
                 AG <span style={{color: '#A85C39'}}>STORE</span>
               </span>

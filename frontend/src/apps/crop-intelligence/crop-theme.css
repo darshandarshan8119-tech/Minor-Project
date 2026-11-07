@@ -1,0 +1,48 @@
+.ag-crop-app {
+  --crop-bg: #f5f9f5;
+  --crop-surface: #ffffff;
+  --crop-muted: #edf4ee;
+  --crop-primary: #175b43;
+  --crop-accent: #29966d;
+  --crop-text: #202923;
+  --crop-secondary: #67736b;
+  --crop-border: #e0e9e1;
+}
+
+.ag-crop-app [class*="text-[#C26747]"],
+.ag-crop-app [class*="text-[#C26747]/"] { color: var(--crop-primary) !important; }
+.ag-crop-app [class*="bg-[#C26747]"] { background-color: var(--crop-primary) !important; }
+.ag-crop-app [class*="border-[#C26747]"] { border-color: var(--crop-primary) !important; }
+.ag-crop-app [class*="hover:bg-[#A85233]"]:hover,
+.ag-crop-app [class*="hover:bg-[#AD5B3E]"]:hover { background-color: #104735 !important; }
+
+.ag-crop-app [class*="bg-[#121212]"] { background-color: var(--crop-primary) !important; }
+.ag-crop-app [class*="hover:bg-[#252525]"]:hover { background-color: #104735 !important; }
+.ag-crop-app [class*="border-[#121212]"] { border-color: var(--crop-primary) !important; }
+.ag-crop-app [class*="text-[#121212]"] { color: var(--crop-text) !important; }
+
+.ag-crop-app [class*="bg-[#F5F4F0]"],
+.ag-crop-app [class*="bg-[#FAF9F5]"],
+.ag-crop-app [class*="bg-[#FBFBF9]"] { background-color: var(--crop-muted) !important; }
+.ag-crop-app [class*="hover:bg-[#EBE8E2]"]:hover,
+.ag-crop-app [class*="hover:bg-[#EFECE5]"]:hover,
+.ag-crop-app [class*="hover:bg-[#F2F0EB]"]:hover { background-color: #e3eee5 !important; }
+.ag-crop-app [class*="text-[#787774]"],
+.ag-crop-app [class*="text-[#55534E]"],
+.ag-crop-app [class*="text-[#5A5A5A]"] { color: var(--crop-secondary) !important; }
+.ag-crop-app [class*="border-black/"] { border-color: var(--crop-border) !important; }
+
+.ag-crop-app button,
+.ag-crop-app a { transition-property: color, background-color, border-color, box-shadow, transform; transition-duration: 160ms; }
+.ag-crop-app button:focus-visible,
+.ag-crop-app a:focus-visible,
+.ag-crop-app input:focus-visible,
+.ag-crop-app select:focus-visible { outline: 2px solid var(--crop-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ag-crop-app *, .ag-crop-app *::before, .ag-crop-app *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

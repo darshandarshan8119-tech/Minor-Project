@@ -246,7 +246,7 @@ export default function MarketCopilotPage({
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] min-h-[640px] overflow-hidden border border-black/[0.08] rounded-2xl shadow-sm bg-white m-4 sm:m-6">
+    <div className="flex h-[calc(100dvh-12.625rem)] min-h-[500px] overflow-hidden border border-[#E8E9E7] rounded-3xl shadow-xs bg-white m-4 sm:m-6">
       {/* ChatGPT-style Left Sidebar */}
       <ConversationSidebar
         conversations={conversations}

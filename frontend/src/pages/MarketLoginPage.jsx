@@ -44,8 +44,7 @@ export default function MarketLoginPage() {
     <ApplicationLoginLayout
       appKey="market"
       brandName="AG Market"
-      subBrandText="APMC MANDI TRADING & COPILOT • BHARAT"
-      headerCropSrc="/assets/logos/header-market-crop-transparent.png"
+      subBrandText="Mandi • Trade • Market Intelligence"
       theme={marketTheme}
       badgeIcon={Scale}
       badgeText="APMC MARKET INTELLIGENCE"
@@ -53,7 +52,7 @@ export default function MarketLoginPage() {
       description="Explore mandi opportunities, commodity intelligence and smarter agricultural trading."
       registerPrompt="New to AgriMart?"
       registerRoute="/market-mandi/register"
-      heroImageSrc="/assets/web/ag-market-hero-clean.png"
+      heroImageSrc="/assets/web/ag-market-ref-hero.png"
       heroAlt="AG Market APMC Trading Engine"
       features={marketFeatures}
       destinationRoute="/market-mandi/app"

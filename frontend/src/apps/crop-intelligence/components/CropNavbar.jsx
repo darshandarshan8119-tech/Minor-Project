@@ -38,13 +38,13 @@ export default function CropNavbar({
               onClick={() => onSelectTab('clinic')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <img src="/assets/logos/ag-crop-logo-transparent.png" alt="AG Crop" className="w-8 h-8 object-contain" />
+              <img src="/assets/logos/official-ag-crop-icon.png" alt="AG Crop Official Logo" className="h-9 w-9 sm:h-10 sm:w-10 object-contain drop-shadow-2xs group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
                 <span className="text-xl sm:text-2xl font-bold tracking-tight font-heading leading-tight" style={{color: '#155B43'}}>
                   AG Crop
                 </span>
-                <span className="text-[10px] tracking-widest text-[#27966F] uppercase font-mono -mt-0.5">
-                  Crop Intelligence Suite &bull; Bharat
+                <span className="text-[9px] tracking-wider text-[#27966F] uppercase font-mono font-bold -mt-0.5">
+                  Crop Health &bull; Soil &bull; Recommendation
                 </span>
               </div>
             </div>

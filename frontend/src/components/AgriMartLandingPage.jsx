@@ -216,22 +216,22 @@ export default function AgriMartLandingPage({ onEnterPlatform, onNavigateRoute }
       <header className="sticky top-0 z-40 bg-[#FBFBF9]/92 backdrop-blur-md border-b border-black/[0.06] transition-all">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
           
-          {/* Brand Mark with Official AgriMart Parent Logo */}
+          {/* Clean Brand Lockup: Isolated Emblem + Styled Wordmark */}
           <div 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group"
           >
             <img 
-              src="/assets/logos/agrimart-parent-logo.png" 
-              alt="AgriMart Official Parent Logo" 
-              className="h-10 w-auto object-contain max-w-[160px] group-hover:scale-105 transition-transform"
+              src="/assets/logos/agrimart-emblem-clean.png" 
+              alt="AgriMart Emblem" 
+              className="h-9 w-9 sm:h-10 sm:w-10 object-contain shrink-0 group-hover:scale-105 transition-transform"
             />
             <div className="flex flex-col">
-              <span className="text-2xl font-extrabold tracking-[0.16em] text-[#121212] uppercase font-heading">
-                AGRI<span className="text-[#C26747]">MART</span>
+              <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#17191C] font-heading leading-tight">
+                Agri<span className="text-[#C47A37]">Mart</span>
               </span>
-              <span className="text-[9px] tracking-[0.25em] text-[#8E8E8E] uppercase font-mono -mt-0.5">
-                Architectural Platform
+              <span className="text-[8.5px] sm:text-[9.5px] tracking-[0.2em] text-[#70777F] uppercase font-mono font-bold -mt-0.5">
+                Architectural Platform &bull; Bharat
               </span>
             </div>
           </div>
@@ -682,17 +682,17 @@ export default function AgriMartLandingPage({ onEnterPlatform, onNavigateRoute }
         <div className="max-w-[1400px] mx-auto space-y-10">
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-black/[0.08]">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <img 
-                src="/assets/logos/agrimart-parent-logo.png" 
-                alt="AgriMart Parent Logo" 
-                className="h-10 w-auto object-contain max-w-[150px]"
+                src="/assets/logos/agrimart-emblem-clean.png" 
+                alt="AgriMart Emblem" 
+                className="h-8 w-8 sm:h-9 sm:w-9 object-contain shrink-0"
               />
               <div>
-                <span className="font-heading font-bold text-base text-[#121212] tracking-wider uppercase block">
-                  AGRI<span className="text-[#C26747]">MART</span>
+                <span className="font-heading font-extrabold text-base text-[#17191C] tracking-tight block">
+                  Agri<span className="text-[#C47A37]">Mart</span>
                 </span>
-                <span className="text-[10px] text-[#8E8E8E] font-mono tracking-widest uppercase">
+                <span className="text-[9px] text-[#70777F] font-mono font-bold tracking-widest uppercase block -mt-0.5">
                   Architectural Agricultural Operating System &bull; Bharat
                 </span>
               </div>

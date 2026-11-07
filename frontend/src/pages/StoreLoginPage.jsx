@@ -44,8 +44,7 @@ export default function StoreLoginPage() {
     <ApplicationLoginLayout
       appKey="store"
       brandName="AG Store"
-      subBrandText="STORE & EQUIPMENT RENTAL • BHARAT"
-      headerCropSrc="/assets/logos/header-store-crop-transparent.png"
+      subBrandText="Inputs • Machinery • Rental"
       theme={storeTheme}
       badgeIcon={Wheat}
       badgeText="SEED & FLEET ACCESS"
@@ -53,7 +52,7 @@ export default function StoreLoginPage() {
       description="Everything your farm needs. From trusted agricultural inputs to dependable equipment rentals."
       registerPrompt="New to AgriMart?"
       registerRoute="/store-rental/register"
-      heroImageSrc="/assets/web/ag-store-hero-clean.png"
+      heroImageSrc="/assets/web/ag-store-ref-hero.png"
       heroAlt="AG Store Seed, Fleet & Equipment at Scale"
       features={storeFeatures}
       destinationRoute="/store-rental/app"

@@ -5,13 +5,14 @@
 // solid pill CTA, bottom 3-pillar feature grid, and clean hero artwork with zero duplicate text.
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, ArrowRight, Eye, EyeOff, 
+import {
+  ArrowLeft, ArrowRight, Eye, EyeOff,
   Mail, Lock, Wheat, Tractor, Sprout, ShieldCheck,
   Scale, TrendingUp, Sparkles, Leaf, FileText, AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import AestheticTransitionLoader from './AestheticTransitionLoader';
+import AppHeaderBrand from './AppHeaderBrand';
 import { apiLogin } from '../services/api';
 
 export default function ApplicationLoginLayout({
@@ -19,8 +20,7 @@ export default function ApplicationLoginLayout({
   appKey = 'store',                   // 'store' | 'market' | 'crop'
   brandName = 'AG Store',
   subBrandText = 'STORE & EQUIPMENT RENTAL • BHARAT',
-  headerCropSrc = '/assets/logos/header-store-crop-transparent.png',
-  
+
   // Theme Tokens
   theme = {
     canvasBg: '#FAF4ED',              // Main page background
@@ -121,11 +121,11 @@ export default function ApplicationLoginLayout({
 
     try {
       const res = await apiLogin(
-        identifier.trim() || '9876543210', 
-        password.trim() || 'FarmerPassword@2026', 
+        identifier.trim() || '9876543210',
+        password.trim() || 'FarmerPassword@2026',
         'farmer'
       );
-      
+
       const sessionData = {
         name: res.user?.full_name || identifier.split('@')[0],
         identifier: res.user?.phone || res.user?.email || identifier,
@@ -175,7 +175,7 @@ export default function ApplicationLoginLayout({
   };
 
   return (
-    <div 
+    <div
       className="relative min-h-[100dvh] flex flex-col font-sans selection:bg-[#EADBCE] selection:text-[#221C17] overflow-x-hidden"
       style={{ backgroundColor: theme.canvasBg }}
     >
@@ -183,39 +183,39 @@ export default function ApplicationLoginLayout({
           BACKGROUND: Fluid Organic Waves & Rolling Landscape Hills
           ========================================================= */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        
+
         {/* Soft Organic Curved Wave Ribbon (flowing from top-right to center) */}
-        <svg 
-          className="absolute -top-12 -right-12 w-[85vw] max-w-[1200px] h-[75vh] opacity-80" 
-          viewBox="0 0 1000 800" 
-          fill="none" 
+        <svg
+          className="absolute -top-12 -right-12 w-[85vw] max-w-[1200px] h-[75vh] opacity-80"
+          viewBox="0 0 1000 800"
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path 
-            d="M1000,0 C800,80 650,220 580,380 C500,560 350,680 100,720 L1000,800 Z" 
-            fill={theme.waveColor} 
+          <path
+            d="M1000,0 C800,80 650,220 580,380 C500,560 350,680 100,720 L1000,800 Z"
+            fill={theme.waveColor}
           />
         </svg>
 
         {/* Bottom Rolling Hills & Sprout Landscape (Exact Image 2 Artwork) */}
         <div className="absolute bottom-0 inset-x-0 h-44 sm:h-52">
-          <svg 
-            className="w-full h-full" 
-            viewBox="0 0 1440 220" 
-            preserveAspectRatio="none" 
-            fill="none" 
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 1440 220"
+            preserveAspectRatio="none"
+            fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Back Hill Layer */}
-            <path 
-              d="M0,130 C240,90 480,160 760,110 C1040,60 1260,140 1440,95 L1440,220 L0,220 Z" 
-              fill={theme.hillLayer1} 
+            <path
+              d="M0,130 C240,90 480,160 760,110 C1040,60 1260,140 1440,95 L1440,220 L0,220 Z"
+              fill={theme.hillLayer1}
               opacity="0.85"
             />
             {/* Front Hill Layer */}
-            <path 
-              d="M0,165 C320,125 560,190 900,145 C1200,105 1360,175 1440,150 L1440,220 L0,220 Z" 
-              fill={theme.hillLayer2} 
+            <path
+              d="M0,165 C320,125 560,190 900,145 C1200,105 1360,175 1440,150 L1440,220 L0,220 Z"
+              fill={theme.hillLayer2}
             />
           </svg>
 
@@ -244,9 +244,9 @@ export default function ApplicationLoginLayout({
 
       {/* Aesthetic Transition Overlay */}
       {isTransitioning && (
-        <AestheticTransitionLoader 
-          targetMode={appKey === 'market' ? 'mandi' : appKey === 'crop' ? 'crop' : 'store'} 
-          message={transitionMessage} 
+        <AestheticTransitionLoader
+          targetMode={appKey === 'market' ? 'mandi' : appKey === 'crop' ? 'crop' : 'store'}
+          message={transitionMessage}
         />
       )}
 
@@ -254,15 +254,14 @@ export default function ApplicationLoginLayout({
           TOP APPLICATION HEADER (Exact Image 2 Header)
           ========================================================= */}
       <header className="relative z-20 max-w-[1400px] w-full mx-auto px-6 sm:px-12 pt-6 pb-4 flex items-center justify-between">
-        
-        {/* Brand Lockup: Header Crop from Design Reference */}
-        <div className="flex items-center">
-          <img 
-            src={headerCropSrc} 
-            alt={`${brandName} Header Logo`}
-            className="h-10 sm:h-12 w-auto object-contain"
-          />
-        </div>
+
+        {/* Canonical Dynamic Brand Lockup (Native Component, Zero Raster Crop Artifacts) */}
+        <AppHeaderBrand 
+          appKey={appKey}
+          brandName={brandName}
+          subBrandText={subBrandText}
+          onClick={handleBackToPortal}
+        />
 
         {/* Action: Return to Portal */}
         <button
@@ -278,18 +277,18 @@ export default function ApplicationLoginLayout({
           MAIN TWO-COLUMN LAYOUT (Open-Canvas, No Heavy Boxes)
           ========================================================= */}
       <main className="relative z-10 flex-1 max-w-[1400px] w-full mx-auto px-6 sm:px-12 py-6 lg:py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-        
+
         {/* ---------------- LEFT COLUMN: Form Area (6 Cols) ---------------- */}
         <div className="lg:col-span-6 flex flex-col justify-center max-w-lg mx-auto w-full space-y-5">
-          
+
           {/* Category Badge */}
           <div>
-            <div 
+            <div
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-semibold tracking-wider uppercase shadow-2xs"
-              style={{ 
-                backgroundColor: theme.badgeBg, 
-                borderColor: theme.badgeBorder, 
-                color: theme.badgeText 
+              style={{
+                backgroundColor: theme.badgeBg,
+                borderColor: theme.badgeBorder,
+                color: theme.badgeText
               }}
             >
               <BadgeIcon className="w-3.5 h-3.5" style={{ color: theme.badgeText }} />
@@ -299,7 +298,7 @@ export default function ApplicationLoginLayout({
 
           {/* Heading */}
           <div className="space-y-2">
-            <h1 
+            <h1
               className="text-4xl sm:text-[44px] font-extrabold font-heading tracking-tight leading-[1.12]"
               style={{ color: theme.textDark }}
             >
@@ -307,7 +306,7 @@ export default function ApplicationLoginLayout({
               <span style={{ color: theme.primary }}>{brandName}</span>
             </h1>
 
-            <p 
+            <p
               className="text-sm font-sans leading-relaxed max-w-md"
               style={{ color: theme.textMuted }}
             >
@@ -343,25 +342,25 @@ export default function ApplicationLoginLayout({
 
           {/* The Form (Exact Match to Image 2) */}
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-            
+
             {/* Input 1: Mobile or Email */}
             <div>
-              <label 
-                className="block font-bold mb-1.5 text-xs"
+              <label
+                className="block font-bold mb-1.5 text-xs font-heading"
                 style={{ color: theme.textDark }}
               >
                 Mobile Number or Email ID
               </label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-3.5 w-4 h-4 text-stone-400 pointer-events-none" />
-                <input 
+                <Mail className="absolute left-4 w-4 h-4 text-stone-400 pointer-events-none" />
+                <input
                   type="text"
                   required
                   autoComplete="username"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="Enter your email or mobile number"
-                  className="w-full bg-white border rounded-xl pl-10 pr-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none transition-all shadow-2xs"
+                  className="w-full bg-white border rounded-full pl-11 pr-5 py-3.5 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400/20 transition-all shadow-xs"
                   style={{ borderColor: theme.inputBorder }}
                 />
               </div>
@@ -370,8 +369,8 @@ export default function ApplicationLoginLayout({
             {/* Input 2: Password with Forgot Password link */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label 
-                  className="font-bold text-xs"
+                <label
+                  className="font-bold text-xs font-heading"
                   style={{ color: theme.textDark }}
                 >
                   Password
@@ -379,7 +378,8 @@ export default function ApplicationLoginLayout({
                 <button
                   type="button"
                   onClick={handleSandboxDemo}
-                  className="text-xs font-medium text-stone-500 hover:underline cursor-pointer"
+                  className="text-xs font-medium hover:underline cursor-pointer"
+                  style={{ color: theme.primary }}
                   title="Click to autofill demo credentials"
                 >
                   Forgot Password?
@@ -387,21 +387,21 @@ export default function ApplicationLoginLayout({
               </div>
 
               <div className="relative flex items-center">
-                <Lock className="absolute left-3.5 w-4 h-4 text-stone-400 pointer-events-none" />
-                <input 
+                <Lock className="absolute left-4 w-4 h-4 text-stone-400 pointer-events-none" />
+                <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full bg-white border rounded-xl pl-10 pr-10 py-3 text-sm font-mono text-stone-900 placeholder:text-stone-400 focus:outline-none transition-all shadow-2xs"
+                  className="w-full bg-white border rounded-full pl-11 pr-12 py-3.5 text-sm font-mono text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400/20 transition-all shadow-xs"
                   style={{ borderColor: theme.inputBorder }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 text-stone-400 hover:text-stone-600 transition-colors"
+                  className="absolute right-4 text-stone-400 hover:text-stone-600 transition-colors p-1"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -412,7 +412,7 @@ export default function ApplicationLoginLayout({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 px-6 rounded-full text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all duration-200 hover:opacity-95 active:scale-[0.99] cursor-pointer"
+              className="w-full py-4 px-6 rounded-full text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition-all duration-200 hover:opacity-95 active:scale-[0.99] cursor-pointer font-heading"
               style={{ backgroundColor: theme.primary }}
             >
               <span>{isLoading ? 'Verifying...' : `Sign In to ${brandName}`}</span>
@@ -442,9 +442,9 @@ export default function ApplicationLoginLayout({
                 return (
                   <div key={idx} className="flex items-start gap-2.5">
                     {IconComponent && (
-                      <IconComponent 
-                        className="w-4 h-4 shrink-0 mt-0.5" 
-                        style={{ color: theme.primary }} 
+                      <IconComponent
+                        className="w-4 h-4 shrink-0 mt-0.5"
+                        style={{ color: theme.primary }}
                       />
                     )}
                     <div>
@@ -465,10 +465,10 @@ export default function ApplicationLoginLayout({
 
         {/* ---------------- RIGHT COLUMN: Clean Hero Artwork (6 Cols) ---------------- */}
         <div className="lg:col-span-6 flex flex-col justify-center">
-          
+
           <div className="relative w-full rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-lg border border-black/[0.05] group">
-            <img 
-              src={heroImageSrc} 
+            <img
+              src={heroImageSrc}
               alt={heroAlt}
               className="w-full h-auto object-cover object-center transform group-hover:scale-[1.02] transition-transform duration-700 ease-out"
             />

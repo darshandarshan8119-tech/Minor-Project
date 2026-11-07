@@ -62,7 +62,7 @@ export default function MarketMandiApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#121212] selection:bg-blue-100 selection:text-[#121212] font-sans">
+    <div className="ag-market-workspace min-h-screen flex flex-col bg-[var(--market-background)] text-[var(--text-primary)] selection:bg-[#E8F1EC] selection:text-[#287653] font-sans">
       
       {/* TOP STRIP: APMC Mandi Stock Ticker */}
       <MandiTicker onOpenMandiTerminal={() => handleTabChange('exchange')} />
@@ -76,7 +76,7 @@ export default function MarketMandiApp() {
       />
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 pb-16">
+      <main className={`flex-1 ${isCopilotRoute ? 'min-h-0' : 'pb-16'}`}>
         {isCopilotRoute ? (
           <MarketCopilotPage 
             user={user} 
@@ -99,10 +99,9 @@ export default function MarketMandiApp() {
         <MarketCopilotLauncher />
       )}
 
-      {/* Dedicated Market Footer */}
-      <MarketFooter 
-        onSelectMandiTab={handleTabChange} 
-      />
+      {!isCopilotRoute && (
+        <MarketFooter onSelectMandiTab={handleTabChange} />
+      )}
 
     </div>
   );

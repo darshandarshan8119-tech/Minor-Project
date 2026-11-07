@@ -11,6 +11,7 @@ import DiseaseDetectionPage from './pages/DiseaseDetectionPage';
 import CropRecommendationPage from './pages/CropRecommendationPage';
 import SoilReportPage from './pages/SoilReportPage';
 import CropHistoryPage from './pages/CropHistoryPage';
+import './crop-theme.css';
 
 export default function CropIntelligenceApp() {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ export default function CropIntelligenceApp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F4FAF5] text-[#121212] selection:bg-[#C8E6D4] selection:text-[#155B43] font-sans">
+    <div className="ag-crop-app min-h-screen flex flex-col bg-[#F4FAF5] text-[#202923] selection:bg-[#CFE5D5] selection:text-[#175B43] font-sans">
       
       {/* Dedicated AG Crop Top Navigation Bar */}
       <CropNavbar

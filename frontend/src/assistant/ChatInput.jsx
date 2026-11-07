@@ -43,7 +43,7 @@ export default function ChatInput({ onSendMessage, disabled = false, placeholder
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
       {/* Quick Prompt Chips */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2.5 text-xs">
+      <div className="flex flex-wrap items-center gap-2 pb-2.5 text-xs">
         {promptChips.map((chip, idx) => (
           <button
             key={idx}
@@ -86,10 +86,11 @@ export default function ChatInput({ onSendMessage, disabled = false, placeholder
             <button
               type="submit"
               disabled={!text.trim() || disabled}
+              aria-label="Send message"
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
                 text.trim() && !disabled
-                  ? 'bg-[#121212] text-white hover:bg-[#C26747] shadow-xs cursor-pointer'
-                  : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                  ? 'bg-[#315F7D] text-white hover:bg-[#244B65] shadow-xs cursor-pointer'
+                  : 'bg-[#EEF2F4] text-[#70808D] border border-[#D5DEE3] cursor-not-allowed'
               }`}>
               <ArrowUp className="w-4 h-4 stroke-[2.5]" />
             </button>

@@ -18,7 +18,7 @@ export default function CropFooter({ onSelectTab }) {
           {/* Mission & Brand */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <img src="/assets/logos/ag-crop-logo-transparent.png" alt="AG Crop" className="w-8 h-8 object-contain" />
+              <img src="/assets/logos/official-ag-crop-icon.png" alt="AG Crop" className="w-8 h-8 object-contain drop-shadow-2xs" />
               <span className="text-2xl font-black tracking-[0.16em] text-[#FBFBF9] uppercase font-heading">
                 AG <span style={{color: '#27966F'}}>CROP</span>
               </span>

@@ -51,8 +51,7 @@ export default function CropLoginPage() {
     <ApplicationLoginLayout
       appKey="crop"
       brandName="AG Crop"
-      subBrandText="CROP INTELLIGENCE & AGRONOMY • BHARAT"
-      headerCropSrc="/assets/logos/header-crop-crop-transparent.png"
+      subBrandText="Crop Health • Soil • Recommendation"
       theme={cropTheme}
       badgeIcon={Leaf}
       badgeText="CROP INTELLIGENCE"
@@ -60,7 +59,7 @@ export default function CropLoginPage() {
       description="Understand your soil, protect your crops and make smarter cultivation decisions."
       registerPrompt="New to AgriMart?"
       registerRoute="/crop-intelligence/register"
-      heroImageSrc="/assets/web/ag-crop-hero-clean.png"
+      heroImageSrc="/assets/web/ag-crop-ref-hero.png"
       heroAlt="AG Crop Diagnostics and Soil Intelligence"
       features={cropFeatures}
       destinationRoute={destination}
