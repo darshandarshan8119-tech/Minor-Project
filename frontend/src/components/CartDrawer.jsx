@@ -1,225 +1,75 @@
-// src/components/CartDrawer.jsx
 import React, { useState } from 'react';
-import { X, Trash2, ShoppingBag, ArrowRight, Truck, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronRight, CreditCard, MapPin, PackageCheck, ShoppingBag, Smartphone, Trash2, Truck, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function CartDrawer({ 
-  isOpen, 
-  onClose, 
-  cartItems, 
-  onUpdateQty, 
-  onRemoveItem,
-  onClearCart 
-}) {
+const PAYMENT_APPS = [
+  { id: 'gpay', name: 'Google Pay', icon: 'https://cdn.simpleicons.org/googlepay/4285F4' },
+  { id: 'phonepe', name: 'PhonePe', icon: 'https://cdn.simpleicons.org/phonepe/5F259F' },
+  { id: 'paytm', name: 'Paytm', icon: 'https://cdn.simpleicons.org/paytm/00BAF2' },
+  { id: 'upi', name: 'Any UPI app', label: 'UPI', style: 'bg-[#E9F5EC] text-[#25733F] border-[#25733F]/20' },
+];
+
+const DELIVERY_STEPS = [
+  ['Order confirmed', 'We received your secure payment.'],
+  ['Packed at the store', 'Certified inputs are being batch-checked.'],
+  ['Out for delivery', 'Our village delivery partner will call you.'],
+  ['Delivered', 'At your doorstep.'],
+];
+
+export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQty, onRemoveItem, onClearCart }) {
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [step, setStep] = useState('cart');
+  const [address, setAddress] = useState({ name: '', phone: '', line: '', village: '', pincode: '' });
+  const [addressError, setAddressError] = useState('');
+  const [paymentApp, setPaymentApp] = useState('');
+  const [orders, setOrders] = useState([]);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const isFreeShipping = subtotal >= 499;
+  const discount = couponApplied ? Math.min(150, Math.floor(subtotal * 0.1)) : 0;
+  const total = Math.max(0, subtotal - discount + (isFreeShipping || !subtotal ? 0 : 50));
+  const selectedOrder = orders.find((placedOrder) => placedOrder.id === selectedOrderId) || orders[0];
 
   if (!isOpen) return null;
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const freeShippingThreshold = 499;
-  const isFreeShipping = subtotal >= freeShippingThreshold;
-  const missingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
-  const discountAmount = couponApplied ? Math.min(150, Math.floor(subtotal * 0.1)) : 0;
-  const finalTotal = Math.max(0, subtotal - discountAmount + (isFreeShipping || subtotal === 0 ? 0 : 50));
-
-  const handleApplyCoupon = (e) => {
-    e.preventDefault();
-    if (couponCode.trim().toUpperCase() === 'AGRIMART10' || couponCode.trim().toUpperCase() === 'KISAN10') {
-      setCouponApplied(true);
-    } else {
-      alert('Invalid promo code. Use "AGRIMART10" for 10% farmer discount.');
+  const close = () => {
+    // A completed order remains available for tracking, but the cart always
+    // reopens in shopping mode so the farmer can place a fresh order.
+    setStep('cart');
+    onClose();
+  };
+  const updateAddress = (field, value) => setAddress({ ...address, [field]: value });
+  const continueToPayment = () => {
+    if (!address.name.trim() || address.phone.length < 10 || !address.line.trim() || !address.village.trim() || address.pincode.length !== 6) {
+      setAddressError('Enter your name, 10-digit phone number, complete address, village, and 6-digit pincode.');
+      return;
     }
+    setAddressError('');
+    setStep('payment');
   };
-
-  const handleCheckout = () => {
-    confetti({
-      particleCount: 90,
-      spread: 60,
-      origin: { y: 0.6 }
-    });
-    setOrderPlaced(true);
-    setTimeout(() => {
+  const payNow = () => {
+    if (!paymentApp) return;
+    setStep('processing');
+    window.setTimeout(() => {
+      const placedOrder = { id: `AG-${String(Date.now()).slice(-6)}`, app: PAYMENT_APPS.find((app) => app.id === paymentApp)?.name, address: { ...address }, itemCount: cartCount, total };
+      setOrders((previousOrders) => [placedOrder, ...previousOrders]);
+      setSelectedOrderId(placedOrder.id);
       onClearCart();
-      setOrderPlaced(false);
-      onClose();
-    }, 3200);
+      setStep('success');
+      confetti({ particleCount: 110, spread: 68, origin: { y: 0.58 }, colors: ['#FFFFFF', '#E7F5EC', '#C47B54'] });
+    }, 1050);
   };
+  const Header = ({ title, backTo, showTracking = false }) => <div className="p-5 sm:p-6 border-b border-[#E8D2C2] flex items-center justify-between bg-[#FFFCF8]"><div className="flex items-center gap-2.5">{backTo ? <button onClick={() => setStep(backTo)} className="p-1 -ml-1 text-[#6B5B53] hover:text-[#A85C39]" aria-label="Go back"><ArrowLeft className="w-4 h-4" /></button> : <ShoppingBag className="w-4 h-4 text-[#A85C39]" />}<h2 className="text-base font-extrabold font-heading text-[#342720] tracking-tight">{title}</h2></div><div className="flex items-center gap-2">{showTracking && <button onClick={() => setStep('tracking')} className="rounded-full border border-[#E8D2C2] bg-white px-3 py-1.5 text-[11px] font-bold text-[#A85C39] hover:bg-[#FFF6EF]">Track order</button>}<button onClick={close} className="w-8 h-8 rounded-full hover:bg-[#F5EDE4] flex items-center justify-center text-[#8D7B70] hover:text-[#342720]" aria-label="Close cart"><X className="w-4 h-4" /></button></div></div>;
+  const Summary = () => <div className="rounded-2xl border border-[#E8D2C2] bg-[#FFFDF9] p-4 space-y-2.5 text-xs text-[#6B5B53]"><div className="flex justify-between"><span>{cartCount} item{cartCount !== 1 ? 's' : ''}</span><span className="font-bold text-[#342720]">₹{subtotal}</span></div>{couponApplied && <div className="flex justify-between text-[#A85C39] font-bold"><span>Farmer discount</span><span>-₹{discount}</span></div>}<div className="flex justify-between"><span>Village delivery</span><span className="font-bold text-[#25733F]">{isFreeShipping ? 'FREE' : '₹50'}</span></div><div className="pt-2.5 border-t border-[#E8D2C2] flex justify-between text-sm font-black text-[#342720] font-heading"><span>Total payable</span><span>₹{total}</span></div></div>;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden animate-in fade-in duration-200">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
-      />
-
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between border-l border-black/[0.06] animate-in slide-in-from-right duration-300">
-          
-          {/* Top Header */}
-          <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <ShoppingBag className="w-4 h-4 text-[#121212] stroke-[1.75]" />
-              <h2 className="text-base font-extrabold font-heading text-[#121212] tracking-tight">
-                Your Farm Cart
-              </h2>
-              <span className="text-xs font-bold text-[#8E8E8E] font-sans">
-                ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
-              </span>
-            </div>
-            <button 
-              onClick={onClose} 
-              className="w-8 h-8 rounded-full hover:bg-[#F5F4F0] flex items-center justify-center text-[#8E8E8E] hover:text-[#121212] transition-colors">
-              <X className="w-4 h-4 stroke-[1.75]" />
-            </button>
-          </div>
-
-          {/* Free Shipping Progress Meter */}
-          <div className="px-6 py-3 bg-[#FBFBF9] border-b border-black/[0.06] text-xs">
-            {isFreeShipping ? (
-              <div className="flex items-center gap-2 text-[#121212] font-semibold">
-                <CheckCircle2 className="w-4 h-4 text-[#283618]" />
-                <span>Free Doorstep Village Delivery unlocked!</span>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between text-[#5A5A5A] font-medium mb-1.5">
-                  <span>Add ₹{missingForFreeShipping} more for <b>Free Delivery</b></span>
-                  <span className="font-bold text-[#121212] font-heading">{Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100))}%</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#EBE8E2] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-[#121212] rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Cart Items List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {orderPlaced ? (
-              <div className="text-center py-20 space-y-3 animate-in zoom-in-95">
-                <div className="w-14 h-14 rounded-full bg-[#F5F4F0] text-[#121212] flex items-center justify-center text-2xl mx-auto">
-                  🌾
-                </div>
-                <h3 className="text-xl font-bold font-heading text-[#121212]">Order Confirmed!</h3>
-                <p className="text-xs text-[#8E8E8E] max-w-xs mx-auto leading-relaxed font-sans">
-                  Thank you! Your seed cultivars and farm inputs are being packed for 48-hour village gate dispatch.
-                </p>
-              </div>
-            ) : cartItems.length === 0 ? (
-              <div className="text-center py-24 space-y-3">
-                <ShoppingBag className="w-8 h-8 text-[#8E8E8E] mx-auto stroke-[1.25]" />
-                <h3 className="text-base font-bold font-heading text-[#121212]">Your cart is empty</h3>
-                <p className="text-xs text-[#8E8E8E] max-w-xs mx-auto font-sans">
-                  Explore our certified catalog of hybrid seeds, power sprayers, and crop care formulations.
-                </p>
-                <button 
-                  onClick={onClose}
-                  className="mt-3 skanvi-pill-btn bg-[#121212] text-white">
-                  Explore Catalog
-                </button>
-              </div>
-            ) : (
-              cartItems.map((item) => (
-                <div key={item.id} className="flex gap-4 p-3.5 rounded-2xl bg-[#FBFBF9] border border-black/[0.05] transition-colors">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-16 h-16 object-cover rounded-xl border border-black/[0.06] shrink-0 bg-white"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-heading font-extrabold text-xs text-[#121212] truncate mb-1">
-                      {item.name}
-                    </h4>
-                    <div className="text-xs font-black text-[#121212] font-heading mb-2">
-                      ₹{item.price}
-                    </div>
-
-                    {/* Stepper & Trash */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center border border-black/[0.1] rounded-full bg-white overflow-hidden text-xs">
-                        <button 
-                          onClick={() => onUpdateQty(item.id, Math.max(1, item.quantity - 1))}
-                          className="px-2.5 py-1 text-[#5A5A5A] hover:bg-black/[0.05] font-bold">-</button>
-                        <span className="px-2 text-[#121212] font-black font-heading min-w-[20px] text-center">{item.quantity}</span>
-                        <button 
-                          onClick={() => onUpdateQty(item.id, item.quantity + 1)}
-                          className="px-2.5 py-1 text-[#5A5A5A] hover:bg-black/[0.05] font-bold">+</button>
-                      </div>
-
-                      <button 
-                        onClick={() => onRemoveItem(item.id)}
-                        className="text-[#8E8E8E] hover:text-rose-600 p-1 transition-colors">
-                        <Trash2 className="w-4 h-4 stroke-[1.75]" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Footer: Coupon & Checkout */}
-          {cartItems.length > 0 && !orderPlaced && (
-            <div className="p-6 border-t border-black/[0.06] bg-[#FBFBF9] space-y-4">
-              
-              {/* Coupon Box */}
-              <form onSubmit={handleApplyCoupon} className="flex items-center gap-2">
-                <input 
-                  type="text" 
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  placeholder="Promo Code (e.g. AGRIMART10)"
-                  className="flex-1 px-3.5 py-2 bg-white text-xs rounded-full border border-black/[0.1] uppercase font-semibold focus:outline-none focus:border-[#121212]"
-                />
-                <button 
-                  type="submit" 
-                  className="px-4 py-2 bg-[#121212] text-white font-bold text-xs rounded-full hover:bg-[#283618] transition-colors font-heading">
-                  Apply
-                </button>
-              </form>
-
-              {/* Price Breakdown */}
-              <div className="space-y-1.5 text-xs text-[#5A5A5A] pt-2 border-t border-black/[0.06] font-sans">
-                <div className="flex justify-between">
-                  <span>Subtotal:</span>
-                  <span className="font-bold text-[#121212] font-heading">₹{subtotal}</span>
-                </div>
-                {couponApplied && (
-                  <div className="flex justify-between text-[#C26747] font-bold font-heading">
-                    <span>Discount (10%):</span>
-                    <span>-₹{discountAmount}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>Village Delivery:</span>
-                  <span className={`font-bold ${isFreeShipping ? 'text-[#283618] font-heading' : 'text-[#121212]'}`}>
-                    {isFreeShipping ? 'FREE' : '₹50'}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm font-black text-[#121212] font-heading pt-2 border-t border-black/[0.06]">
-                  <span>Total Payable:</span>
-                  <span className="text-base">₹{finalTotal}</span>
-                </div>
-              </div>
-
-              {/* Checkout Button */}
-              <button 
-                onClick={handleCheckout}
-                className="w-full bg-[#121212] hover:bg-[#283618] text-white font-extrabold text-xs py-3.5 rounded-full shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 font-heading">
-                <span>Place Order (Cash on Delivery / UPI)</span>
-                <ArrowRight className="w-4 h-4 stroke-[1.75]" />
-              </button>
-            </div>
-          )}
-
-        </div>
-      </div>
-    </div>
-  );
+  const cartView = <><Header title="Your Farm Cart" showTracking={orders.length > 0} /><div className="px-6 py-3 bg-[#F5EDE4] border-b border-[#E8D2C2] text-xs">{isFreeShipping ? <div className="flex items-center gap-2 text-[#25733F] font-semibold"><CheckCircle2 className="w-4 h-4" />Free doorstep village delivery unlocked</div> : <><div className="flex justify-between text-[#6B5B53] font-medium mb-1.5"><span>Add ₹{499 - subtotal} more for free delivery</span><span className="font-bold text-[#342720]">{Math.max(0, Math.round((subtotal / 499) * 100))}%</span></div><div className="w-full h-1.5 bg-[#E8D2C2] rounded-full overflow-hidden"><div className="h-full bg-[#A85C39] rounded-full transition-all" style={{ width: `${Math.min(100, (subtotal / 499) * 100)}%` }} /></div></>}</div>{orders.length > 0 && <button onClick={() => setStep('tracking')} className="mx-5 sm:mx-6 mt-4 w-[calc(100%-2.5rem)] sm:w-[calc(100%-3rem)] rounded-2xl border border-[#CDE3D4] bg-[#F2FAF4] p-3 flex items-center justify-between text-left"><span className="flex items-center gap-2.5"><span className="w-8 h-8 rounded-xl bg-[#25733F] text-white flex items-center justify-center"><Truck className="w-4 h-4" /></span><span><span className="block text-xs font-bold text-[#284534]">Track your {orders.length} order{orders.length !== 1 ? 's' : ''}</span><span className="block mt-0.5 text-[11px] text-[#567361]">Latest: {selectedOrder?.id}</span></span></span><ChevronRight className="w-4 h-4 text-[#25733F]" /></button>}<div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">{cartItems.length === 0 ? <div className="text-center py-24 space-y-3"><ShoppingBag className="w-8 h-8 text-[#B9A99D] mx-auto" /><h3 className="text-base font-bold font-heading text-[#342720]">Your cart is empty</h3><p className="text-xs text-[#8D7B70] max-w-xs mx-auto">Explore certified seeds, tools, and crop care formulations.</p><button onClick={close} className="mt-3 skanvi-pill-btn bg-[#A85C39] text-white">Explore catalog</button></div> : cartItems.map((item) => <div key={item.id} className="flex gap-4 p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#E8D2C2]"><img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl border border-[#E8D2C2] shrink-0" /><div className="flex-1 min-w-0"><h4 className="font-heading font-extrabold text-xs text-[#342720] truncate mb-1">{item.name}</h4><div className="text-xs font-black text-[#342720] font-heading mb-2">₹{item.price}</div><div className="flex items-center justify-between"><div className="flex items-center border border-[#E8D2C2] rounded-full bg-white overflow-hidden text-xs"><button onClick={() => onUpdateQty(item.id, Math.max(1, item.quantity - 1))} className="px-2.5 py-1 text-[#6B5B53] hover:bg-[#F5EDE4] font-bold">-</button><span className="px-2 text-[#342720] font-black min-w-[20px] text-center">{item.quantity}</span><button onClick={() => onUpdateQty(item.id, item.quantity + 1)} className="px-2.5 py-1 text-[#6B5B53] hover:bg-[#F5EDE4] font-bold">+</button></div><button onClick={() => onRemoveItem(item.id)} className="text-[#A9978C] hover:text-rose-600 p-1" aria-label={`Remove ${item.name}`}><Trash2 className="w-4 h-4" /></button></div></div></div>)}</div>{cartItems.length > 0 && <div className="p-5 sm:p-6 border-t border-[#E8D2C2] bg-[#FFF9F3] space-y-4"><form onSubmit={(e) => { e.preventDefault(); if (['AGRIMART10', 'KISAN10'].includes(couponCode.trim().toUpperCase())) setCouponApplied(true); else window.alert('Invalid promo code. Use AGRIMART10 for a farmer discount.'); }} className="flex gap-2"><input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} placeholder="Promo code e.g. AGRIMART10" className="min-w-0 flex-1 px-3.5 py-2 bg-white text-xs rounded-full border border-[#E8D2C2] uppercase font-semibold focus:outline-none focus:ring-2 focus:ring-[#A85C39]/30" /><button className="px-4 py-2 bg-[#342720] text-white font-bold text-xs rounded-full">Apply</button></form><Summary /><button onClick={() => setStep('address')} className="w-full bg-[#A85C39] hover:bg-[#8E4828] text-white font-extrabold text-xs py-3.5 rounded-full transition-all active:scale-[.98] flex items-center justify-center gap-2 font-heading">Continue to delivery address <ArrowRight className="w-4 h-4" /></button></div>}</>;
+  const field = 'w-full px-3.5 py-3 bg-white text-xs rounded-xl border border-[#E8D2C2] text-[#342720] placeholder:text-[#9A887C] focus:outline-none focus:ring-2 focus:ring-[#A85C39]/30 focus:border-[#A85C39]';
+  const addressView = <><Header title="Delivery address" backTo="cart" /><div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5"><div className="flex gap-3 rounded-2xl bg-[#F5EDE4] p-3.5 text-xs text-[#6B5B53]"><MapPin className="w-4 h-4 shrink-0 text-[#A85C39]" /><p>We use this address only to deliver your agricultural inputs and updates.</p></div><div className="space-y-3"><input value={address.name} onChange={(e) => updateAddress('name', e.target.value)} placeholder="Full name" className={field} /><input value={address.phone} inputMode="numeric" onChange={(e) => updateAddress('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="Mobile number" className={field} /><textarea value={address.line} onChange={(e) => updateAddress('line', e.target.value)} placeholder="House number, street, landmark" rows="3" className={`${field} resize-none`} /><input value={address.village} onChange={(e) => updateAddress('village', e.target.value)} placeholder="Village / town" className={field} /><input value={address.pincode} inputMode="numeric" onChange={(e) => updateAddress('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit pincode" className={field} /></div>{addressError && <p className="text-xs text-rose-700 bg-rose-50 rounded-xl px-3 py-2.5">{addressError}</p>}<Summary /></div><div className="p-5 sm:p-6 border-t border-[#E8D2C2] bg-[#FFF9F3]"><button onClick={continueToPayment} className="w-full bg-[#A85C39] hover:bg-[#8E4828] text-white font-extrabold text-xs py-3.5 rounded-full transition-all active:scale-[.98] flex items-center justify-center gap-2 font-heading">Choose payment mode <ArrowRight className="w-4 h-4" /></button></div></>;
+  const paymentView = <><Header title="Payment" backTo="address" /><div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5"><div className="flex items-center gap-3 rounded-2xl border border-[#E8D2C2] bg-[#FFFDF9] p-3.5"><Smartphone className="w-5 h-5 text-[#A85C39]" /><div><p className="text-xs font-bold text-[#342720]">Pay securely with UPI</p><p className="text-[11px] text-[#8D7B70]">Select your preferred payment app.</p></div></div><div className="grid grid-cols-2 gap-3">{PAYMENT_APPS.map((app) => <button key={app.id} onClick={() => setPaymentApp(app.id)} className={`relative flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all ${paymentApp === app.id ? 'border-[#A85C39] bg-[#FFF6EF] ring-2 ring-[#A85C39]/15' : 'border-[#E8D2C2] bg-[#FFFDF9] hover:border-[#C47B54]'}`}>{app.icon ? <span className="w-9 h-9 rounded-xl border border-[#E8D2C2] bg-white p-2 flex items-center justify-center"><img src={app.icon} alt={`${app.name} logo`} className="w-full h-full object-contain" /></span> : <span className="w-9 h-9 rounded-xl border border-[#25733F]/20 bg-[#E9F5EC] text-[#25733F] flex items-center justify-center font-black text-[10px]">UPI</span>}<span className="text-xs font-bold text-[#342720]">{app.name}</span>{paymentApp === app.id && <CheckCircle2 className="absolute right-2.5 top-2.5 w-4 h-4 text-[#A85C39]" />}</button>)}</div><Summary /><div className="flex items-center gap-2 text-[11px] text-[#8D7B70]"><CreditCard className="w-3.5 h-3.5" />Your payment is protected by UPI security.</div></div><div className="p-5 sm:p-6 border-t border-[#E8D2C2] bg-[#FFF9F3]"><button disabled={!paymentApp} onClick={payNow} className="w-full bg-[#A85C39] enabled:hover:bg-[#8E4828] disabled:bg-[#CBB8AA] text-white font-extrabold text-xs py-3.5 rounded-full transition-all active:scale-[.98] flex items-center justify-center gap-2 font-heading">Pay ₹{total} <ArrowRight className="w-4 h-4" /></button></div></>;
+  const successView = <div className="relative flex-1 min-h-[100dvh] overflow-hidden bg-[#25733F] text-white checkout-success-screen"><div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(255,255,255,.22),transparent_42%)]" /><div className="relative min-h-[100dvh] flex flex-col items-center justify-center px-8 text-center"><div className="checkout-success-check w-24 h-24 rounded-full bg-white text-[#25733F] flex items-center justify-center shadow-2xl"><Check className="w-12 h-12 stroke-[3]" /></div><p className="mt-7 text-xs font-bold tracking-[.16em] uppercase text-white/70">Payment successful</p><h2 className="mt-2 text-3xl font-black font-heading tracking-tight">Order confirmed</h2><p className="mt-3 max-w-xs text-sm leading-relaxed text-white/85">Your certified farm inputs are reserved for delivery to {selectedOrder?.address.village}.</p><div className="mt-7 w-full max-w-xs border border-white/20 bg-white/10 rounded-2xl px-4 py-3 flex justify-between text-xs"><span className="text-white/70">Order ID</span><span className="font-bold">{selectedOrder?.id}</span></div><button onClick={() => setStep('tracking')} className="mt-8 w-full max-w-xs rounded-full bg-white py-3.5 text-xs font-extrabold text-[#25733F] active:scale-[.98] flex items-center justify-center gap-2">Track delivery <ChevronRight className="w-4 h-4" /></button></div></div>;
+  const trackingView = <><Header title="Track your orders" backTo="cart" /><div className="flex-1 overflow-y-auto p-5 sm:p-6"><p className="mb-3 text-[11px] font-bold uppercase tracking-[.12em] text-[#8D7B70]">Select an order</p><div className="flex gap-2 overflow-x-auto pb-3">{orders.map((placedOrder) => <button key={placedOrder.id} onClick={() => setSelectedOrderId(placedOrder.id)} className={`shrink-0 rounded-xl border px-3 py-2 text-left ${selectedOrder?.id === placedOrder.id ? 'border-[#A85C39] bg-[#FFF6EF]' : 'border-[#E8D2C2] bg-white'}`}><span className="block text-xs font-bold text-[#342720]">{placedOrder.id}</span><span className="block mt-0.5 text-[10px] text-[#8D7B70]">₹{placedOrder.total} · {placedOrder.address.village}</span></button>)}</div><div className="mt-3 rounded-2xl bg-[#F5EDE4] border border-[#E8D2C2] p-4 flex gap-3"><div className="w-10 h-10 rounded-xl bg-[#A85C39] text-white flex items-center justify-center shrink-0"><Truck className="w-5 h-5" /></div><div><p className="text-xs font-black text-[#342720]">Preparing your order</p><p className="mt-1 text-[11px] leading-relaxed text-[#6B5B53]">Estimated delivery: 2 to 3 working days. We will call {selectedOrder?.address.phone} before arrival.</p></div></div><div className="mt-7 space-y-0">{DELIVERY_STEPS.map(([title, copy], index) => <div key={title} className="relative flex gap-3 pb-7 last:pb-0"><div className="flex flex-col items-center"><span className={`w-7 h-7 rounded-full flex items-center justify-center border-2 ${index === 0 ? 'bg-[#25733F] border-[#25733F] text-white' : 'bg-white border-[#E8D2C2] text-[#B3A095]'}`}>{index === 0 ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <span className="w-1.5 h-1.5 rounded-full bg-current" />}</span>{index < DELIVERY_STEPS.length - 1 && <span className="w-px flex-1 min-h-8 bg-[#E8D2C2]" />}</div><div className="pt-1"><p className={`text-xs font-bold ${index === 0 ? 'text-[#342720]' : 'text-[#9A887C]'}`}>{title}</p><p className="mt-1 text-[11px] text-[#8D7B70]">{copy}</p></div></div>)}</div><div className="mt-3 rounded-2xl border border-[#E8D2C2] p-4 text-xs text-[#6B5B53]"><div className="flex justify-between"><span>Delivery to</span><span className="font-bold text-[#342720]">{selectedOrder?.address.village}, {selectedOrder?.address.pincode}</span></div><div className="flex justify-between mt-2"><span>Paid via</span><span className="font-bold text-[#342720]">{selectedOrder?.app}</span></div></div></div><div className="p-5 sm:p-6 border-t border-[#E8D2C2] bg-[#FFF9F3]"><button onClick={close} className="w-full bg-[#A85C39] hover:bg-[#8E4828] text-white font-extrabold text-xs py-3.5 rounded-full active:scale-[.98] flex items-center justify-center gap-2 font-heading">Continue shopping <PackageCheck className="w-4 h-4" /></button></div></>;
+  const processingView = <div className="flex-1 flex flex-col items-center justify-center text-center p-8"><div className="w-14 h-14 rounded-full border-4 border-[#E8D2C2] border-t-[#A85C39] animate-spin" /><h2 className="mt-6 text-lg font-black font-heading text-[#342720]">Opening {PAYMENT_APPS.find((app) => app.id === paymentApp)?.name}</h2><p className="mt-2 text-xs text-[#8D7B70]">Please wait while we confirm your payment.</p></div>;
+  return <div className="fixed inset-0 z-50 overflow-hidden animate-in fade-in duration-200"><div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={step === 'processing' ? undefined : close} /><div className="fixed inset-y-0 right-0 max-w-full flex pl-8 sm:pl-10"><div className="w-screen max-w-md bg-[#FFFDF9] shadow-2xl flex flex-col border-l border-[#E8D2C2] animate-in slide-in-from-right duration-300">{step === 'cart' && cartView}{step === 'address' && addressView}{step === 'payment' && paymentView}{step === 'processing' && processingView}{step === 'success' && successView}{step === 'tracking' && trackingView}</div></div></div>;
 }
